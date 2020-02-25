@@ -271,11 +271,11 @@ public abstract class AbstractKieModule
             ResourceType resourceType = conf instanceof ResourceConfigurationImpl && ((ResourceConfigurationImpl)conf).getResourceType() != null ?
                                         ((ResourceConfigurationImpl)conf).getResourceType() :
                                         ResourceType.determineResourceType(fileName);
-
+            
             if (resourceType == ResourceType.DTABLE && conf instanceof DecisionTableConfiguration) {
                 for (RuleTemplateModel template : kieBaseModel.getRuleTemplates()) {
-                    if (template.getDtable().equals( fileName )) {
-                        Resource templateResource = getResource( template.getTemplate() );
+                    if (fileName.endsWith( template.getDtable() )) {
+                        Resource templateResource = getResource( fileName.replace(template.getDtable(), "") + template.getTemplate() );
                         if ( templateResource != null ) {
                             ( (DecisionTableConfiguration) conf ).addRuleTemplateConfiguration( templateResource, template.getRow(), template.getCol() );
                         } else {
