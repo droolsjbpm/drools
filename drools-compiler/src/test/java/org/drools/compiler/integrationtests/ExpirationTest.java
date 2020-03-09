@@ -994,4 +994,91 @@ public class ExpirationTest {
         assertEquals(2, kieSession.fireAllRules());
         assertEquals(isExpired ? 0 : 2, kieSession.getObjects().size());
     }
+
+    @Test
+    public void testAlphaExpired_1() throws InterruptedException {
+        // DROOLS-5050
+        final String drl =
+                " package org.drools.compiler.integrationtests;\n" +
+                        " import " + DummyEvent.class.getCanonicalName() + ";\n" +
+                        " import " + ApplicationEvent.class.getCanonicalName() + ";\n" +
+                        " declare DummyEvent\n" +
+                        "     @role( event )\n" +
+                        "     @timestamp( eventTimestamp )\n" +
+                        "     @expires( 1s )\n" +
+                        " end\n" +
+                        " rule R1\n" +
+                        " when\n" +
+                        "     $evt : DummyEvent()\n" +
+                        " then \n" +
+                        " end\n" +
+                        " rule R2\n" +
+                        " when\n" +
+                        "     $evt : DummyEvent()\n" +
+                        " then \n" +
+                        " end\n" +
+                        " rule R3\n" +
+                        " when\n" +
+                        "     $evt : ApplicationEvent()\n" +
+                        " then \n" +
+                        " end\n";
+
+        final KieSessionConfiguration sessionConfig = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
+        sessionConfig.setOption( ClockTypeOption.get( ClockType.PSEUDO_CLOCK.getId() ) );
+
+        final KieHelper helper = new KieHelper();
+        helper.addContent( drl, ResourceType.DRL );
+        final KieBase kieBase = helper.build( EventProcessingOption.STREAM );
+        final KieSession kieSession = kieBase.newKieSession( sessionConfig, null );
+
+        PseudoClockScheduler clock = kieSession.getSessionClock();
+        final long currentTime = clock.getCurrentTime();
+        clock.advanceTime(10, TimeUnit.SECONDS);
+
+        kieSession.insert(new DummyEvent(10, currentTime));
+
+        Assertions.assertThat(kieSession.fireAllRules()).isEqualTo(3);
+        Assertions.assertThat(kieSession.fireAllRules()).isEqualTo(0);
+    }
+
+    @Test
+    public void testAlphaExpired_2() throws InterruptedException {
+        // DROOLS-5050
+        final String drl =
+                " package org.drools.compiler.integrationtests;\n" +
+                        " import " + DummyEvent.class.getCanonicalName() + ";\n" +
+                        " import " + ApplicationEvent.class.getCanonicalName() + ";\n" +
+                        " declare DummyEvent\n" +
+                        "     @role( event )\n" +
+                        "     @timestamp( eventTimestamp )\n" +
+                        "     @expires( 1s )\n" +
+                        " end\n" +
+                        " rule R1\n" +
+                        " when\n" +
+                        "     $evt : DummyEvent()\n" +
+                        " then \n" +
+                        " end\n" +
+                        " rule R2\n" +
+                        " when\n" +
+                        "     $evt : ApplicationEvent()\n" +
+                        " then \n" +
+                        " end\n";
+
+        final KieSessionConfiguration sessionConfig = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
+        sessionConfig.setOption( ClockTypeOption.get( ClockType.PSEUDO_CLOCK.getId() ) );
+
+        final KieHelper helper = new KieHelper();
+        helper.addContent( drl, ResourceType.DRL );
+        final KieBase kieBase = helper.build( EventProcessingOption.STREAM );
+        final KieSession kieSession = kieBase.newKieSession( sessionConfig, null );
+
+        PseudoClockScheduler clock = kieSession.getSessionClock();
+        final long currentTime = clock.getCurrentTime();
+        clock.advanceTime(10, TimeUnit.SECONDS);
+
+        kieSession.insert(new DummyEvent(10, currentTime));
+
+        Assertions.assertThat(kieSession.fireAllRules()).isEqualTo(2);
+        Assertions.assertThat(kieSession.fireAllRules()).isEqualTo(0);
+    }
 }
