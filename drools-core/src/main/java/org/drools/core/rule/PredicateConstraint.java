@@ -223,6 +223,9 @@ public class PredicateConstraint extends MutableTypeConstraint
             }
         }
 
+        if (this.expression == null) {
+            return other.expression == null;
+        }
         return this.expression.equals( other.expression );
     }
 

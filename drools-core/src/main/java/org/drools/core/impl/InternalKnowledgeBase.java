@@ -24,6 +24,7 @@ import java.util.concurrent.Future;
 
 import org.drools.core.RuleBaseConfiguration;
 import org.drools.core.SessionConfiguration;
+import org.drools.core.addon.AlphaNodeOrderingStrategy;
 import org.drools.core.base.ClassFieldAccessorCache;
 import org.drools.core.common.InternalAgenda;
 import org.drools.core.common.InternalWorkingMemory;
@@ -150,4 +151,6 @@ public interface InternalKnowledgeBase extends KieBase {
 
     List<AsyncReceiveNode> getReceiveNodes();
     void addReceiveNode(AsyncReceiveNode node);
+
+    AlphaNodeOrderingStrategy getAlphaNodeOrderingStrategy();
 }

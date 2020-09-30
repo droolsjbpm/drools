@@ -328,7 +328,11 @@ public class Declaration
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     public String toString() {
-        return "(" + this.readAccessor.getValueType() + ") " + this.identifier;
+        if (readAccessor instanceof ClassFieldReader && !((ClassFieldReader) readAccessor).hasReadAccessor()) {
+            return "(null) " + this.identifier;
+        } else {
+            return "(" + this.readAccessor.getValueType() + ") " + this.identifier;
+        }
     }
 
     public int hashCode() {

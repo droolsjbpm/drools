@@ -43,6 +43,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.drools.core.RuleBaseConfiguration;
 import org.drools.core.SessionConfiguration;
 import org.drools.core.SessionConfigurationImpl;
+import org.drools.core.addon.AlphaNodeOrderingStrategy;
+import org.drools.core.addon.NoopOrderingStrategy;
 import org.drools.core.base.ClassFieldAccessorCache;
 import org.drools.core.base.ClassObjectType;
 import org.drools.core.common.BaseNode;
@@ -190,6 +192,8 @@ public class KnowledgeBaseImpl
 
     private KieSessionsPool sessionPool;
 
+    private transient AlphaNodeOrderingStrategy alphaNodeOrderingStrategy = new NoopOrderingStrategy();
+
     public KnowledgeBaseImpl() { }
 
     public KnowledgeBaseImpl(final String id,
@@ -219,6 +223,8 @@ public class KnowledgeBaseImpl
         if (this.config.getSessionPoolSize() > 0) {
             sessionPool = newKieSessionsPool( this.config.getSessionPoolSize() );
         }
+
+        alphaNodeOrderingStrategy = AlphaNodeOrderingStrategy.createAlphaNodeOrderingStrategy(this.config.getAlphaNodeOrderingOption());
     }
 
     @Override
@@ -499,6 +505,8 @@ public class KnowledgeBaseImpl
         }
 
         this.getConfiguration().getComponentFactory().initTraitFactory(this);
+
+        this.alphaNodeOrderingStrategy = AlphaNodeOrderingStrategy.createAlphaNodeOrderingStrategy(this.config.getAlphaNodeOrderingOption());
 
         rewireReteAfterDeserialization();
     }
@@ -840,6 +848,8 @@ public class KnowledgeBaseImpl
         for ( InternalWorkingMemory wm : getWorkingMemories() ) {
             wm.flushPropagations();
         }
+
+        alphaNodeOrderingStrategy.analyzeAlphaConstraints(pkgs, clonedPkgs);
 
         // we need to merge all byte[] first, so that the root classloader can resolve classes
         for (InternalKnowledgePackage newPkg : clonedPkgs) {
@@ -1795,5 +1805,9 @@ public class KnowledgeBaseImpl
             receiveNodes = new ArrayList<>();
         }
         receiveNodes.add(node);
+    }
+
+    public AlphaNodeOrderingStrategy getAlphaNodeOrderingStrategy() {
+        return alphaNodeOrderingStrategy;
     }
 }

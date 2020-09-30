@@ -186,6 +186,8 @@ public class CanonicalKieModule implements InternalKieModule {
             kbConf.setOption(kBaseModel.getEventProcessingMode());
             kbConf.setOption(kBaseModel.getDeclarativeAgenda());
             kbConf.setOption(kBaseModel.getSequential());
+            kbConf.setOption(kBaseModel.getSessionsPool());
+            kbConf.setOption(kBaseModel.getAlphaNodeOrdering());
         }
         return kbConf;
     }

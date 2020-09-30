@@ -36,6 +36,7 @@ import org.kie.api.builder.model.KieBaseModel;
 import org.kie.api.builder.model.KieModuleModel;
 import org.kie.api.builder.model.KieSessionModel;
 import org.kie.api.builder.model.RuleTemplateModel;
+import org.kie.api.conf.AlphaNodeOrderingOption;
 import org.kie.api.conf.DeclarativeAgendaOption;
 import org.kie.api.conf.EqualityBehaviorOption;
 import org.kie.api.conf.EventProcessingOption;
@@ -57,6 +58,8 @@ public class KieBaseModelImpl
     private List<String>                 packages;
 
     private EqualityBehaviorOption       equalsBehavior = EqualityBehaviorOption.IDENTITY;
+
+    private AlphaNodeOrderingOption      alphaNodeOrdering = AlphaNodeOrderingOption.NONE;
 
     private EventProcessingOption        eventProcessingMode = EventProcessingOption.CLOUD;
 
@@ -243,6 +246,15 @@ public class KieBaseModelImpl
         return this;
     }
 
+    public AlphaNodeOrderingOption getAlphaNodeOrdering() {
+        return alphaNodeOrdering;
+    }
+
+    public KieBaseModel setAlphaNodeOrdering(AlphaNodeOrderingOption alphaNodeOrdering) {
+        this.alphaNodeOrdering = alphaNodeOrdering;
+        return this;
+    }
+
     /* (non-Javadoc)
      * @see org.kie.kproject.KieBaseModel#getEventProcessingMode()
      */
@@ -343,6 +355,9 @@ public class KieBaseModelImpl
             if ( kBase.getEqualsBehavior() != null ) {
                 writer.addAttribute( "equalsBehavior", kBase.getEqualsBehavior().toString().toLowerCase() );
             }
+            if ( kBase.getAlphaNodeOrdering() != null ) {
+                writer.addAttribute( "alphaNodeOrdering", kBase.getAlphaNodeOrdering().toString().toLowerCase() );
+            }
             if ( kBase.getDeclarativeAgenda() != null ) {
                 writer.addAttribute( "declarativeAgenda", kBase.getDeclarativeAgenda().toString().toLowerCase() );
             }
@@ -411,6 +426,11 @@ public class KieBaseModelImpl
             String equalsBehavior = reader.getAttribute( "equalsBehavior" );
             if ( equalsBehavior != null ) {
                 kBase.setEqualsBehavior( EqualityBehaviorOption.determineEqualityBehavior( equalsBehavior ) );
+            }
+
+            String alphaNodeOrdering = reader.getAttribute( "alphaNodeOrdering" );
+            if ( alphaNodeOrdering != null ) {
+                kBase.setAlphaNodeOrdering( AlphaNodeOrderingOption.determineAlphaNodeOrdering( alphaNodeOrdering ) );
             }
 
             String declarativeAgenda = reader.getAttribute( "declarativeAgenda" );

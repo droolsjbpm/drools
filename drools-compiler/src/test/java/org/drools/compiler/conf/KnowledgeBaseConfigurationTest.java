@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.kie.api.KieBaseConfiguration;
 import org.kie.api.KieServices;
+import org.kie.api.conf.AlphaNodeOrderingOption;
 import org.kie.api.conf.EqualityBehaviorOption;
 import org.kie.api.conf.EventProcessingOption;
 import org.kie.api.conf.RemoveIdentitiesOption;
@@ -391,7 +392,31 @@ public class KnowledgeBaseConfigurationTest {
         assertEquals( "cloud",
                       config.getProperty( EventProcessingOption.PROPERTY_NAME ) );
     }
-    
+
+    @Test
+    public void testAlphaNodeOrderingConfiguration() {
+        // setting the option using the type safe method
+        config.setOption(AlphaNodeOrderingOption.COUNT);
+
+        // checking the type safe getOption() method
+        assertEquals(AlphaNodeOrderingOption.COUNT,
+                     config.getOption(AlphaNodeOrderingOption.class));
+        // checking the string based getProperty() method
+        assertEquals("count",
+                     config.getProperty(AlphaNodeOrderingOption.PROPERTY_NAME));
+
+        // setting the options using the string based setProperty() method
+        config.setProperty(AlphaNodeOrderingOption.PROPERTY_NAME,
+                           "none");
+
+        // checking the type safe getOption() method
+        assertEquals(AlphaNodeOrderingOption.NONE,
+                     config.getOption(AlphaNodeOrderingOption.class));
+        // checking the string based getProperty() method
+        assertEquals("none",
+                     config.getProperty(AlphaNodeOrderingOption.PROPERTY_NAME));
+    }
+
     @Test
     public void testMaxThreadsConfiguration() {
         // setting the option using the type safe method
