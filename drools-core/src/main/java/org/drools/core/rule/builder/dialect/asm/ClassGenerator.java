@@ -453,16 +453,22 @@ public class ClassGenerator {
         private ClassGenerator classGenerator;
         protected MethodVisitor mv;
         private Map<Integer, Type> storedTypes;
+        
+        private final Object classGeneratorMutex = new Object();
 
         protected abstract void body(MethodVisitor mv);
 
         public final void writeBody(ClassGenerator classGenerator, MethodVisitor mv) {
-            this.classGenerator = classGenerator;
+            synchronized(classGeneratorMutex) {
+                this.classGenerator = classGenerator;
+            }
             this.mv = mv;
             try {
                 body(mv);
             } finally {
-                this.classGenerator = null;
+                synchronized(classGeneratorMutex) {
+                    this.classGenerator = null;
+                }
                 this.mv = null;
             }
         }

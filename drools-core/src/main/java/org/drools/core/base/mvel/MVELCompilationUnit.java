@@ -86,6 +86,8 @@ public class MVELCompilationUnit
     private SimpleVariableSpaceModel             varModel;
 
     private int                                  allVarsLength;
+        
+    private final Object                         mvelCompilerFlagsMutex = new Object();
 
     public static final Map<String, Interceptor> INTERCEPTORS = new InterceptorMap();
 
@@ -444,10 +446,17 @@ public class MVELCompilationUnit
 
     private static Serializable compile( final String text,
                                          final ParserContext parserContext ) {
-        MVEL.COMPILER_OPT_ALLOW_NAKED_METH_CALL = true;
-        MVEL.COMPILER_OPT_ALLOW_OVERRIDE_ALL_PROPHANDLING = true;
-        MVEL.COMPILER_OPT_ALLOW_RESOLVE_INNERCLASSES_WITH_DOTNOTATION = true;
-        MVEL.COMPILER_OPT_SUPPORT_JAVA_STYLE_CLASS_LITERALS = true;   
+        if ( !( MVEL.COMPILER_OPT_ALLOW_NAKED_METH_CALL &&
+                MVEL.COMPILER_OPT_ALLOW_OVERRIDE_ALL_PROPHANDLING &&
+                MVEL.COMPILER_OPT_ALLOW_RESOLVE_INNERCLASSES_WITH_DOTNOTATION &&
+                MVEL.COMPILER_OPT_SUPPORT_JAVA_STYLE_CLASS_LITERALS ) ) {
+            synchronized ( mvelCompilerFlagsMutex ) {
+                MVEL.COMPILER_OPT_ALLOW_NAKED_METH_CALL = true;
+                MVEL.COMPILER_OPT_ALLOW_OVERRIDE_ALL_PROPHANDLING = true;
+                MVEL.COMPILER_OPT_ALLOW_RESOLVE_INNERCLASSES_WITH_DOTNOTATION = true;
+                MVEL.COMPILER_OPT_SUPPORT_JAVA_STYLE_CLASS_LITERALS = true;
+            }
+        }
         
         if ( MVELDebugHandler.isDebugMode() ) {
             parserContext.setDebugSymbols( true );
