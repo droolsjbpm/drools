@@ -758,7 +758,9 @@ public class ProtobufInputMarshaller {
                 trigger.setRepeatLimit( _interval.getRepeatLimit() );
                 trigger.setRepeatCount( _interval.getRepeatCount() );
                 if ( _interval.hasNextFireTime() ) {
-                    trigger.setNextFireTime( new Date( _interval.getNextFireTime() ) );
+                    long now = inCtx.wm.getSessionClock().getCurrentTime() + _interval.getPeriod();
+                    long nextFireTime = Math.max(now, _interval.getNextFireTime());
+                    trigger.setNextFireTime( new Date( nextFireTime ) );
                 }
                 trigger.setPeriod( _interval.getPeriod() );
                 String[] calendarNames = new String[_interval.getCalendarNameCount()];
