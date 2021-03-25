@@ -2105,11 +2105,13 @@ public class CompilerTest extends BaseModelTest {
         private Boolean testBoolean;
         private int testInt;
         private Short testShort;
+        private double testDouble;
 
-        public IntegerToShort(Boolean testBoolean, int testInt, Short testShort) {
+        public IntegerToShort(Boolean testBoolean, int testInt, Short testShort, Double testDouble) {
             this.testBoolean = testBoolean;
             this.testInt = testInt;
             this.testShort = testShort;
+            this.testDouble = testDouble;
         }
 
         public void setTestBoolean(Boolean testBoolean) {
@@ -2136,6 +2138,14 @@ public class CompilerTest extends BaseModelTest {
             return testShort;
         }
 
+        public Double getTestDouble() {
+            return testDouble;
+        }
+
+        public void setTestDouble(Double testShort) {
+            this.testDouble = testDouble;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) {
@@ -2145,12 +2155,12 @@ public class CompilerTest extends BaseModelTest {
                 return false;
             }
             IntegerToShort that = (IntegerToShort) o;
-            return testInt == that.testInt && Objects.equals(testBoolean, that.testBoolean) && Objects.equals(testShort, that.testShort);
+            return testInt == that.testInt && Objects.equals(testBoolean, that.testBoolean) && Objects.equals(testShort, that.testShort) && Objects.equals(testDouble, that.testDouble);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(testBoolean, testInt, testShort);
+            return Objects.hash(testBoolean, testInt, testShort, testDouble);
         }
 
         @Override
@@ -2159,6 +2169,7 @@ public class CompilerTest extends BaseModelTest {
                     "testBoolean=" + testBoolean +
                     ", testInt=" + testInt +
                     ", testShort=" + testShort +
+                    ", testDouble=" + testDouble +
                     '}';
         }
     }
@@ -2204,13 +2215,13 @@ public class CompilerTest extends BaseModelTest {
                         "end";
 
         KieSession ksession = getKieSession(str);
-        IntegerToShort integerToShort = new IntegerToShort(false, Short.MAX_VALUE, (short)0);
+        IntegerToShort integerToShort = new IntegerToShort(false, Short.MAX_VALUE, (short)0, (double)0);
 
         ksession.insert(integerToShort);
         int rulesFired = ksession.fireAllRules();
 
         Assert.assertEquals(1, rulesFired);
-        assertThat(integerToShort).isEqualTo(new IntegerToShort(true, Short.MAX_VALUE, Short.MAX_VALUE));
+        assertThat(integerToShort).isEqualTo(new IntegerToShort(true, Short.MAX_VALUE, Short.MAX_VALUE, (double)0));
     }
 
     @Test // DROOLS-5998
@@ -2232,13 +2243,42 @@ public class CompilerTest extends BaseModelTest {
                         "end";
 
         KieSession ksession = getKieSession(str);
-        IntegerToShort integerToShort = new IntegerToShort(false, Short.MAX_VALUE, (short)0);
+        IntegerToShort integerToShort = new IntegerToShort(false, Short.MAX_VALUE, (short)0, (double)0);
 
         ksession.insert(integerToShort);
         int rulesFired = ksession.fireAllRules();
 
         Assert.assertEquals(1, rulesFired);
-        assertThat(integerToShort).isEqualTo(new IntegerToShort(true, Short.MAX_VALUE, (short)-12));
+        assertThat(integerToShort).isEqualTo(new IntegerToShort(true, Short.MAX_VALUE, (short)-12, (double)0));
+    }
+
+    @Test // RHDM-1644
+    public void testCastingIntegerToShortWithDoubleVar() {
+        String str =
+                "import " + IntegerToShort.class.getCanonicalName() + ";\n " +
+                        "rule \"test_rule\"\n" +
+                        "dialect \"java\"\n" +
+                        "when\n" +
+                        "   $integerToShort : IntegerToShort( " +
+                        "           $testDouble : testDouble, " +
+                        "           $testInt : testInt, " +
+                        "           testBoolean != null, " +
+                        "           testBoolean == false" +
+                        ") \n" +
+                        "then\n" +
+                        "   $integerToShort.setTestShort((short)((16 + $testDouble))); \n" +
+                        "   $integerToShort.setTestBoolean(true);\n" +
+                        "   update($integerToShort);\n" +
+                        "end";
+
+        KieSession ksession = getKieSession(str);
+        IntegerToShort integerToShort = new IntegerToShort(false, Short.MAX_VALUE, (short)0, (double)1);
+
+        ksession.insert(integerToShort);
+        int rulesFired = ksession.fireAllRules();
+
+        Assert.assertEquals(1, rulesFired);
+        assertThat(integerToShort).isEqualTo(new IntegerToShort(true, Short.MAX_VALUE, (short)17, (double)1));
     }
 
     @Test
