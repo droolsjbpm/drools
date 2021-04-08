@@ -10099,11 +10099,44 @@ public class RuleModelDRLPersistenceUnmarshallingTest extends BaseRuleModelTest 
         assertTrue(constraint instanceof SingleFieldConstraint);
         assertEquals("contains", ((SingleFieldConstraint) constraint).getOperator());
         assertEquals("String.join( \"-\", \"abc\",\"xyz\")",((SingleFieldConstraint)constraint).getValue());
+        assertEquals(BaseSingleFieldConstraint.TYPE_RET_VALUE, ((SingleFieldConstraint) constraint).getConstraintValueType());
 
         final FieldConstraint constraintNot = ((FactPattern) m.lhs[0]).getConstraint(1);
         assertTrue(constraintNot instanceof SingleFieldConstraint);
         assertEquals("not contains", ((SingleFieldConstraint) constraintNot).getOperator());
         assertEquals("String.join( \"hello\", \" \",\"there\")",((SingleFieldConstraint)constraintNot).getValue());
+        assertEquals(BaseSingleFieldConstraint.TYPE_RET_VALUE, ((SingleFieldConstraint) constraintNot).getConstraintValueType());
+    }
+
+    @Test
+    public void testContainsWithFormula_Integer() {
+
+        final String drl = "rule \"therule\"\n" +
+                "dialect \"mvel\"\n" +
+                "when\n" +
+                "CustomerProfile( listValue contains ( Integer.max( 1, 2 ) )," +
+                "listValue not contains ( Integer.min( 1, 2 ) ) )\n" +
+                "then\n" +
+                "end";
+
+        final PackageDataModelOracle dmo = mock(PackageDataModelOracle.class);
+        final RuleModel m =  RuleModelDRLPersistenceImpl.getInstance().unmarshal(drl,
+                                                                                 Collections.EMPTY_LIST,
+                                                                                 dmo);
+        assertNotNull(m);
+        assertTrue(m.lhs[0] instanceof FactPattern);
+
+        final FieldConstraint constraint = ((FactPattern) m.lhs[0]).getConstraint(0);
+        assertTrue(constraint instanceof SingleFieldConstraint);
+        assertEquals("contains", ((SingleFieldConstraint) constraint).getOperator());
+        assertEquals("Integer.max( 1, 2 )",((SingleFieldConstraint)constraint).getValue());
+        assertEquals(BaseSingleFieldConstraint.TYPE_RET_VALUE, ((SingleFieldConstraint) constraint).getConstraintValueType());
+
+        final FieldConstraint constraintNot = ((FactPattern) m.lhs[0]).getConstraint(1);
+        assertTrue(constraintNot instanceof SingleFieldConstraint);
+        assertEquals("not contains", ((SingleFieldConstraint) constraintNot).getOperator());
+        assertEquals("Integer.min( 1, 2 )",((SingleFieldConstraint)constraintNot).getValue());
+        assertEquals(BaseSingleFieldConstraint.TYPE_RET_VALUE, ((SingleFieldConstraint) constraintNot).getConstraintValueType());
     }
 
     /**
