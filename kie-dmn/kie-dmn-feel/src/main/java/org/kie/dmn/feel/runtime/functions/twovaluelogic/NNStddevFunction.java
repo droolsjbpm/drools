@@ -29,10 +29,8 @@ import org.kie.dmn.feel.runtime.functions.FEELFnResult;
 import org.kie.dmn.feel.runtime.functions.ParameterName;
 import org.kie.dmn.feel.runtime.functions.SqrtFunction;
 import org.kie.dmn.feel.util.EvalHelper;
-import org.kie.dmn.model.api.GwtIncompatible;
 
 // based on the examples of calculations, stddev is supposed to return sample standard deviation, not population standard deviation
-@GwtIncompatible
 public class NNStddevFunction
         extends BaseFEELFunction {
     public static final NNStddevFunction INSTANCE = new NNStddevFunction();

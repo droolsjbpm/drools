@@ -58,7 +58,7 @@ public final class TypeUtil {
         for (final Object object : collection) {
             if (object == null) {
                 continue;
-            } else if (!expectedType.isAssignableFrom(object.getClass())) {
+            } else if (!ClassUtil.isAssignableFrom(expectedType, object.getClass())) {
                 return false;
             }
         }

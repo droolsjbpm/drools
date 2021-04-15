@@ -50,6 +50,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.treblereel.gwt</groupId>
+      <artifactId>gwt-bigmath</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-user</artifactId>
       <scope>provided</scope>

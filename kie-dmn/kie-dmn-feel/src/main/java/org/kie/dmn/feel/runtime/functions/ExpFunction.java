@@ -6,9 +6,7 @@ import java.math.MathContext;
 import ch.obermuhlner.math.big.BigDecimalMath;
 import org.kie.dmn.api.feel.runtime.events.FEELEvent;
 import org.kie.dmn.feel.runtime.events.InvalidParametersEvent;
-import org.kie.dmn.model.api.GwtIncompatible;
 
-@GwtIncompatible
 public class ExpFunction
         extends BaseFEELFunction {
     public static final ExpFunction INSTANCE = new ExpFunction();

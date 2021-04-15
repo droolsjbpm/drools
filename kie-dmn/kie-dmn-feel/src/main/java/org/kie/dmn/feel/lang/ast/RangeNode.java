@@ -26,6 +26,7 @@ import org.kie.dmn.feel.lang.types.BuiltInType;
 import org.kie.dmn.feel.lang.types.impl.ComparablePeriod;
 import org.kie.dmn.feel.runtime.Range;
 import org.kie.dmn.feel.runtime.impl.RangeImpl;
+import org.kie.dmn.feel.util.ClassUtil;
 import org.kie.dmn.feel.util.Msg;
 
 public class RangeNode
@@ -103,7 +104,7 @@ public class RangeNode
         
         Type sType = BuiltInType.determineTypeFromInstance(s);
         Type eType = BuiltInType.determineTypeFromInstance(e);
-        if (s != null && e != null && sType != eType && !s.getClass().isAssignableFrom(e.getClass())) {
+        if (s != null && e != null && sType != eType && !ClassUtil.isAssignableFrom(s.getClass(), e.getClass())) {
             ctx.notifyEvt( astEvent(Severity.ERROR, Msg.createMessage(Msg.X_TYPE_INCOMPATIBLE_WITH_Y_TYPE, "Start", "End")));
             return null;
         }

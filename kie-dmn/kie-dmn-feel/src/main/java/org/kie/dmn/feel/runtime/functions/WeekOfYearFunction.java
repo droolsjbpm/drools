@@ -23,9 +23,7 @@ import java.time.temporal.WeekFields;
 import org.kie.dmn.api.feel.runtime.events.FEELEvent.Severity;
 import org.kie.dmn.feel.runtime.events.InvalidParametersEvent;
 import org.kie.dmn.feel.util.EvalHelper;
-import org.kie.dmn.model.api.GwtIncompatible;
 
-@GwtIncompatible
 public class WeekOfYearFunction extends BaseFEELFunction {
     public static final WeekOfYearFunction INSTANCE = new WeekOfYearFunction();
 

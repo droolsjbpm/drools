@@ -50,7 +50,6 @@ import org.kie.dmn.feel.lang.types.BuiltInType;
 import org.kie.dmn.feel.lang.types.impl.ComparablePeriod;
 import org.kie.dmn.feel.runtime.Range;
 import org.kie.dmn.feel.runtime.Range.RangeBoundary;
-import org.kie.dmn.model.api.GwtIncompatible;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -155,7 +154,7 @@ public class EvalHelper {
                 && (value.toString().equals("NaN") || value.toString().equals("Infinity") || value.toString().equals("-Infinity"))) ) {
             return null;
         }
-        if ( !BigDecimal.class.isAssignableFrom( value.getClass() ) ) {
+        if ( !ClassUtil.isAssignableFrom(BigDecimal.class, value.getClass() ) ) {
             if ( value instanceof Long || value instanceof Integer || value instanceof Short || value instanceof Byte ||
                  value instanceof AtomicLong || value instanceof AtomicInteger ) {
                 value = new BigDecimal( ((Number) value).longValue(), MathContext.DECIMAL128 );
@@ -450,7 +449,6 @@ public class EvalHelper {
      * @param field
      * @return
      */
-    @GwtIncompatible
     public static Method getGenericAccessor(Class<?> clazz, String field) {
         LOG.trace( "getGenericAccessor({}, {})", clazz, field );
 
@@ -458,7 +456,7 @@ public class EvalHelper {
 			.append(".").append(field).toString();
 
         return accessorCache.computeIfAbsent(accessorQualifiedName, key ->
-        	Stream.of( clazz.getMethods() )
+        	Stream.of(ClassUtil.getMethods(clazz) )
             .filter( m -> Optional.ofNullable( m.getAnnotation( FEELProperty.class ) )
                     .map( ann -> ann.value().equals( field ) )
                     .orElse( false )
@@ -477,17 +475,16 @@ public class EvalHelper {
      * @param field
      * @return
      */
-    @GwtIncompatible
     public static Method getAccessor(Class<?> clazz, String field) {
         LOG.trace( "getAccessor({}, {})", clazz, field );
         try {
-            return clazz.getMethod( "get" + ucFirst( field ) );
+            return ClassUtil.getMethod(clazz, "get" + ucFirst(field ) );
         } catch ( NoSuchMethodException e ) {
             try {
-                return clazz.getMethod( field );
+                return ClassUtil.getMethod(clazz, field );
             } catch ( NoSuchMethodException e1 ) {
                 try {
-                    return clazz.getMethod( "is" + ucFirst( field ) );
+                    return ClassUtil.getMethod(clazz, "is" + ucFirst(field ) );
                 } catch ( NoSuchMethodException e2 ) {
                     return null;
                 }
@@ -551,7 +548,7 @@ public class EvalHelper {
         if ((left instanceof String && right instanceof String) ||
             (left instanceof Number && right instanceof Number) ||
             (left instanceof Boolean && right instanceof Boolean) ||
-            (left instanceof Comparable && left.getClass().isAssignableFrom(right.getClass()))) {
+            (left instanceof Comparable && ClassUtil.isAssignableFrom(left.getClass(), right.getClass()))) {
             Comparable l = (Comparable) left;
             Comparable r = (Comparable) right;
             return op.test(l, r);

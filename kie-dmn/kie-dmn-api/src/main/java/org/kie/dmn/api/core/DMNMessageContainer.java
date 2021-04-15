@@ -2,13 +2,10 @@ package org.kie.dmn.api.core;
 
 import java.util.List;
 
-import org.kie.dmn.model.api.GwtIncompatible;
-
 /**
  * An interface for message container objects like
  * DMNResults and DMNModel
  */
-@GwtIncompatible
 public interface DMNMessageContainer {
     /**
      * Returns a list of all the messages produced

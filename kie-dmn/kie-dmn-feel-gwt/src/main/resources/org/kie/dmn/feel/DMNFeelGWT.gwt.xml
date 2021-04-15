@@ -28,6 +28,7 @@
   <inherits name="org.jresearch.gwt.locale.langtag.module"/>
   <inherits name="org.jresearch.gwt.locale.module"/>
   <inherits name="org.kie.dmn.feel.DMNFeel"/>
+  <inherits name="ch.obermuhlner.math.big.BigMath" />
 
   <source path="entrypoint"/>
   <source path="client"/>

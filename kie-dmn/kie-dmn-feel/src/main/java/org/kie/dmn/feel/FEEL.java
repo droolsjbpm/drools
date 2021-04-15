@@ -28,7 +28,6 @@ import org.kie.dmn.feel.lang.FEELProfile;
 import org.kie.dmn.feel.lang.Type;
 import org.kie.dmn.feel.lang.impl.FEELImpl;
 import org.kie.dmn.feel.runtime.UnaryTest;
-import org.kie.dmn.model.api.GwtIncompatible;
 
 /**
  * FEEL expression language engine interface
@@ -51,7 +50,6 @@ public interface FEEL {
      *
      * @return a newly instantiated FEEL engine instance
      */
-    @GwtIncompatible
     static FEEL newInstance(ClassLoader cl) {
         return new FEELImpl(cl);
     }
@@ -70,7 +68,6 @@ public interface FEEL {
      *
      * @return a newly instantiated FEEL engine instance
      */
-    @GwtIncompatible
     static FEEL newInstance(ClassLoader cl, List<FEELProfile> profiles) {
         return new FEELImpl(cl, profiles);
     }
@@ -171,7 +168,7 @@ public interface FEEL {
      *
      * @return the result of the evaluation of the expression.
      */
-    Object evaluate(CompiledExpression expr, EvaluationContext ctx);
+    Object evaluate(CompiledExpression expression, EvaluationContext ctx);
 
     /**
      * Evaluates the given expression as a list of of unary tests.
