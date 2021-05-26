@@ -59,6 +59,7 @@ import org.drools.model.patterns.PatternImpl;
 import org.drools.model.patterns.QueryCallPattern;
 import org.drools.model.view.AccumulateExprViewItem;
 import org.drools.model.view.CombinedExprViewItem;
+import org.drools.model.view.ConsequenceViewItem;
 import org.drools.model.view.ExistentialExprViewItem;
 import org.drools.model.view.Expr10ViewItemImpl;
 import org.drools.model.view.Expr11ViewItemImpl;
@@ -80,7 +81,6 @@ import org.drools.model.view.QueryCallViewItem;
 import org.drools.model.view.ViewItem;
 
 import static java.util.stream.Collectors.toList;
-
 import static org.drools.model.impl.NamesGenerator.generateName;
 
 public class ViewPatternBuilder implements ViewBuilder {
@@ -110,13 +110,13 @@ public class ViewPatternBuilder implements ViewBuilder {
                 continue;
             }
 
-            conditions.add( ruleItem2Condition( ruleItem ) );
+            conditions.add( ruleItem2Condition( ruleItem, consequences ) );
         }
 
         return new CompositePatterns( Condition.Type.AND, conditions, consequences );
     }
 
-    public static Condition ruleItem2Condition(RuleItem ruleItem) {
+    public static Condition ruleItem2Condition(RuleItem ruleItem, Map<String, Consequence> consequences) {
         if ( ruleItem instanceof PatternDefImpl ) {
             PatternDefImpl<?> patternDef = ( PatternDefImpl ) ruleItem;
             Variable<?> patternVariable = patternDef.getFirstVariable();
@@ -147,26 +147,38 @@ public class ViewPatternBuilder implements ViewBuilder {
             CombinedExprViewItem combined = ( CombinedExprViewItem ) ruleItem;
             List<Condition> conditions = new ArrayList<>();
             for (ViewItem expr : combined.getExpressions()) {
-                conditions.add(ruleItem2Condition( expr ));
+                conditions.add(ruleItem2Condition( expr, consequences ));
             }
             return new CompositePatterns( combined.getType(), conditions );
         }
 
+        if (ruleItem instanceof ConsequenceViewItem) {
+            ConsequenceViewItem conseqenceView = (ConsequenceViewItem) ruleItem;
+            List<Condition> conditions = new ArrayList<>();
+            ViewItem expr = conseqenceView.getExpression();
+            conditions.add(ruleItem2Condition(expr, consequences));
+            ConditionalNamedConsequenceImpl conditionalNamedConsequenceImpl = new ConditionalNamedConsequenceImpl(null, // null expr results in LambdaEvalExpression.EMPTY which is "always true"
+                                                                                                                  createNamedConsequence(consequences, conseqenceView.getNamedConsequence()),
+                                                                                                                  null);
+            conditions.add(conditionalNamedConsequenceImpl);
+            return new CompositePatterns(Condition.Type.AND, conditions);
+        }
+
         if ( ruleItem instanceof ExistentialExprViewItem ) {
             ExistentialExprViewItem existential = (ExistentialExprViewItem) ruleItem;
-            return new ExistentialPatternImpl( ruleItem2Condition( existential.getExpression() ), existential.getType() );
+            return new ExistentialPatternImpl( ruleItem2Condition( existential.getExpression(), consequences ), existential.getType() );
         }
 
         if ( ruleItem instanceof GroupByExprViewItem ) {
             GroupByExprViewItem groupBy = ( GroupByExprViewItem ) ruleItem;
-            return new GroupByPatternImpl(ruleItem2Condition( groupBy.getExpr() ),
+            return new GroupByPatternImpl(ruleItem2Condition( groupBy.getExpr(), consequences ),
                     groupBy.getVars(), groupBy.getVarKey(), groupBy.getGroupingFunction(),
                     groupBy.getAccumulateFunctions());
         }
 
         if ( ruleItem instanceof AccumulateExprViewItem ) {
             AccumulateExprViewItem acc = (AccumulateExprViewItem) ruleItem;
-            return new AccumulatePatternImpl(ruleItem2Condition( acc.getExpr() ), null, acc.getAccumulateFunctions());
+            return new AccumulatePatternImpl(ruleItem2Condition( acc.getExpr(), consequences ), null, acc.getAccumulateFunctions());
         }
 
         if ( ruleItem instanceof ExprViewItem ) {

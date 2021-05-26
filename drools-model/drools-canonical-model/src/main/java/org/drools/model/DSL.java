@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import org.drools.model.consequences.ConsequenceBuilder;
+import org.drools.model.consequences.ConsequenceBuilder.AbstractValidBuilder;
 import org.drools.model.datasources.DataStore;
 import org.drools.model.datasources.DataStream;
 import org.drools.model.datasources.impl.DataStreamImpl;
@@ -82,6 +83,7 @@ import org.drools.model.impl.WindowImpl;
 import org.drools.model.impl.WindowReferenceImpl;
 import org.drools.model.view.AccumulateExprViewItem;
 import org.drools.model.view.CombinedExprViewItem;
+import org.drools.model.view.ConsequenceViewItem;
 import org.drools.model.view.ExistentialExprViewItem;
 import org.drools.model.view.Expr10ViewItemImpl;
 import org.drools.model.view.Expr11ViewItemImpl;
@@ -323,6 +325,10 @@ public class DSL {
             return expression.get();
         }
         return new CombinedExprViewItem(Condition.Type.AND, combineExprs( expression, expressions ) );
+    }
+
+    public static ViewItem and(ViewItemBuilder<?> expression, AbstractValidBuilder<?> namedConsequence) {
+        return new ConsequenceViewItem(expression.get(), namedConsequence.get());
     }
 
     protected static ViewItem[] combineExprs( ViewItemBuilder<?> expression, ViewItemBuilder<?>... expressions ) {

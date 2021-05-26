@@ -364,4 +364,75 @@ public class NamedConsequencesTest extends BaseModelTest {
         assertEquals(1, results.size());
         assertTrue(results.contains("cheddar"));
     }
+
+    @Test
+    public void testNamedConsequencesInsideOR1() {
+        String str = "import " + Cheese.class.getCanonicalName() + ";\n " +
+                     "global java.util.List results;\n" +
+                     "\n" +
+                     "rule R1 when\n" +
+                     "    ( $a: Cheese ( type == \"stilton\" ) do[t1]\n" +
+                     "    or\n" +
+                     "    $b: Cheese ( type == \"gorgonzola\" ) )\n" +
+                     "    $c: Cheese ( type == \"cheddar\" )\n" +
+                     "then\n" +
+                     "    results.add( $c.getType() );\n" +
+                     "then[t1]\n" +
+                     "    results.add( $a.getType() );\n" +
+                     "end\n";
+
+        KieSession ksession = getKieSession(str);
+
+        List<String> results = new ArrayList<String>();
+        ksession.setGlobal("results", results);
+
+        Cheese stilton = new Cheese("stilton", 5);
+        Cheese cheddar = new Cheese("cheddar", 7);
+        Cheese brie = new Cheese("brie", 5);
+
+        ksession.insert(stilton);
+        ksession.insert(cheddar);
+        ksession.insert(brie);
+
+        ksession.fireAllRules();
+
+        assertEquals(2, results.size());
+        assertTrue(results.contains("cheddar"));
+        assertTrue(results.contains("stilton"));
+    }
+
+    @Test
+    public void testNamedConsequencesInsideOR2() {
+        String str = "import " + Cheese.class.getCanonicalName() + ";\n " +
+                     "global java.util.List results;\n" +
+                     "\n" +
+                     "rule R1 when\n" +
+                     "    ( $a: Cheese ( type == \"stilton\" )\n" +
+                     "    or\n" +
+                     "    $b: Cheese ( type == \"gorgonzola\" ) do[t1] )\n" +
+                     "    $c: Cheese ( type == \"cheddar\" )\n" +
+                     "then\n" +
+                     "    results.add( $c.getType() );\n" +
+                     "then[t1]\n" +
+                     "    results.add( $b.getType() );\n" +
+                     "end\n";
+
+        KieSession ksession = getKieSession(str);
+
+        List<String> results = new ArrayList<String>();
+        ksession.setGlobal("results", results);
+
+        Cheese stilton = new Cheese("stilton", 5);
+        Cheese cheddar = new Cheese("cheddar", 7);
+        Cheese brie = new Cheese("brie", 5);
+
+        ksession.insert(stilton);
+        ksession.insert(cheddar);
+        ksession.insert(brie);
+
+        ksession.fireAllRules();
+
+        assertEquals(1, results.size());
+        assertTrue(results.contains("cheddar"));
+    }
 }
