@@ -16,11 +16,12 @@
 
 package org.kie.dmn.feel.gwt.functions.client;
 
-import java.util.List;
-
 import org.kie.dmn.feel.gwt.functions.api.FunctionOverrideVariation;
+
+import java.util.List;
 
 public interface FEELFunctionProvider {
 
-    public List<FunctionOverrideVariation> getDefinitions();
+    List<FunctionOverrideVariation> getDefinitions();
+
 }

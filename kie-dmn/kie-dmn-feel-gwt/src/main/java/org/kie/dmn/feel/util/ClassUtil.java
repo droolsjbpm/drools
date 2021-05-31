@@ -16,10 +16,20 @@
 package org.kie.dmn.feel.util;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
+import com.google.gwt.core.client.GWT;
+import org.kie.dmn.feel.gwt.functions.api.FunctionOverrideVariation;
+import org.kie.dmn.feel.gwt.functions.client.FEELFunctionProvider;
+import org.kie.dmn.feel.gwtreflection.MethodProvider;
 import org.kie.dmn.feel.runtime.functions.BaseFEELFunction;
 
 public class ClassUtil {
+
+    private static FEELFunctionProvider FUNCTION_PROVIDER = GWT.create(FEELFunctionProvider.class);
+    private static MethodProvider METHOD_PROVIDER = GWT.create(MethodProvider.class);
 
     public static boolean isAssignableFrom(final Class thisClass,
                                            final Class otherClass) {
@@ -53,10 +63,20 @@ public class ClassUtil {
     }
 
     public static boolean isInstance(final Class<?> clazz, final Object o) {
-        return true;
+        return isAssignableFrom(clazz, o.getClass());
     }
 
     public static Method[] getDeclaredMethods(final Class<? extends BaseFEELFunction> clazz) {
-        return new Method[0];
+
+        final List<Method> result = new ArrayList<>();
+
+        for (FunctionOverrideVariation definition : FUNCTION_PROVIDER.getDefinitions()) {
+            if (Objects.equals(clazz.getName(), definition.getFunctionReturnTypeFQCNName())) {
+                final Method method = METHOD_PROVIDER.get(definition);
+                result.add(method);
+            }
+        }
+
+        return result.toArray(new Method[result.size()]);
     }
 }

@@ -16,7 +16,10 @@
 package java.lang.reflect;
 
 public class Modifier {
+
+    public static final int PUBLIC = 0x00000001;
+
     public static boolean isPublic(int mod) {
-        return true;
+        return (mod & PUBLIC) != 0;
     }
 }

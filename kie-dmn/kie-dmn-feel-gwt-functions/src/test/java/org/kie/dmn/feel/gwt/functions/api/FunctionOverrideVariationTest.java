@@ -29,12 +29,12 @@ public class FunctionOverrideVariationTest {
     @Before
     public void setup() {
 
-        final Parameter input = new Parameter("input", STRING);
-        final Parameter pattern = new Parameter("pattern", STRING);
-        final Parameter replacement = new Parameter("replacement", STRING);
-        final Parameter flags = new Parameter("flags", STRING);
+        final Parameter input = new Parameter("input", String.class, STRING);
+        final Parameter pattern = new Parameter("pattern", String.class, STRING);
+        final Parameter replacement = new Parameter("replacement", String.class, STRING);
+        final Parameter flags = new Parameter("flags", String.class, STRING);
 
-        functionOverrideVariation = new FunctionOverrideVariation(STRING, "replace", input, pattern, replacement, flags);
+        functionOverrideVariation = new FunctionOverrideVariation(STRING, "org.feel.ReplaceFunction", "replace", input, pattern, replacement, flags);
     }
 
     @Test

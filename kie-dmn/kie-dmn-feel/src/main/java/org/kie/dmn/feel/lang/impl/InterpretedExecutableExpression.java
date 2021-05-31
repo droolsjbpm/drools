@@ -20,9 +20,7 @@ import org.kie.dmn.feel.codegen.feel11.CompiledFEELExpression;
 import org.kie.dmn.feel.lang.EvaluationContext;
 import org.kie.dmn.feel.lang.ast.ASTNode;
 import org.kie.dmn.feel.lang.ast.FunctionDefNode;
-import org.kie.dmn.model.api.GwtIncompatible;
 
-@GwtIncompatible
 public class InterpretedExecutableExpression implements CompiledFEELExpression {
 
     private final CompiledExpressionImpl expr;

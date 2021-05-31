@@ -24,6 +24,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.kie.dmn.feel.runtime.FEELFunction;
@@ -43,12 +44,16 @@ public class MethodTemplates {
 
         final StringBuilder builder = new StringBuilder();
 
-        builder.append("public List<FunctionOverrideVariation> getDefinitions() {\n");
-        builder.append("    ArrayList definitions = new ArrayList();\n");
+        builder.append("private ArrayList definitions = null;\n");
 
+        builder.append("public List<FunctionOverrideVariation> getDefinitions() {\n");
+
+        builder.append("    if(definitions == null) {\n");
+        builder.append("        definitions = new ArrayList();\n");
         for (final String signature : getFunctionSignatures()) {
-            builder.append(String.format("definitions.add( %s );\n", signature));
+            builder.append(String.format("      definitions.add( %s );\n", signature));
         }
+        builder.append("    }\n");
 
         builder.append("    return definitions;\n");
         builder.append("}");
@@ -89,28 +94,39 @@ public class MethodTemplates {
                 }
 
                 final Class<?>[] parameterTypes = declaredMethod.getParameterTypes();
-                paramBuilder.append(String.format("new Parameter( \"%s\", %s )",
+                paramBuilder.append(String.format("new Parameter( \"%s\", %s, %s )",
                                                   getParameterNameAnnotation(parameterAnnotation),
+                                                  getClass(parameterTypes[i]),
                                                   getType(parameterTypes[i].getTypeName())));
                 i++;
             }
 
             if (paramBuilder.length() == 0) {
-                result.add(String.format("new FunctionOverrideVariation( %s, \"%s\" )",
+                result.add(String.format("new FunctionOverrideVariation( %s, \"%s\", \"%s\" )",
                                          getReturnType(function,
                                                        declaredMethod.getGenericReturnType()),
+                                         function.getClass().getName(),
                                          function.getName()));
             } else {
 
-                result.add(String.format("new FunctionOverrideVariation( %s, \"%s\", %s )",
+                result.add(String.format("new FunctionOverrideVariation( %s, \"%s\", \"%s\", %s )",
                                          getReturnType(function,
                                                        declaredMethod.getGenericReturnType()),
+                                         function.getClass().getName(),
                                          function.getName(),
                                          paramBuilder.toString()));
             }
         }
 
         return result;
+    }
+
+    private static String getClass(final Class<?> parameterType) {
+        if (Objects.equals("[Ljava.lang.Object;", parameterType.getName())) {
+            return "Object[].class";
+        } else {
+            return parameterType.getName() + ".class";
+        }
     }
 
     private static String getParameterNameAnnotation(final Annotation[] parameterAnnotation) {
