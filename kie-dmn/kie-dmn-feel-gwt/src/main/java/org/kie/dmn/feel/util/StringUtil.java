@@ -22,8 +22,10 @@ import com.google.gwt.regexp.shared.SplitResult;
 
 public class StringUtil {
 
-    public static String format(final String mask, final Object... params) {
-        final RegExp regex = RegExp.compile("%[a-z]");
+    public static String format(final String mask,
+                                final Object... params) {
+        final RegExp regex = RegExp.compile("%f|%[a-z]|%.+[0-9]f");
+
         final SplitResult split = regex.split(mask);
         final StringBuffer msg = new StringBuffer();
         for (int pos = 0; pos < split.length() - 1; ++pos) {
@@ -43,7 +45,7 @@ public class StringUtil {
         while (index < string.length()) {
 
             int codePoint = Character.codePointAt(string, index);
-            codePoints[codePointIndex] = codePoint;
+            codePoints[codePointIndex++] = codePoint;
 
             int charCount = Character.charCount(codePoint);
             index += charCount;

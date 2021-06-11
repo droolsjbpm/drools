@@ -19,7 +19,8 @@ import java.util.stream.IntStream;
 
 public class StringUtil {
 
-    public static String format(final String mask, final Object[] params) {
+    public static String format(final String mask,
+                                final Object... params) {
         return String.format(mask, params);
     }
 
