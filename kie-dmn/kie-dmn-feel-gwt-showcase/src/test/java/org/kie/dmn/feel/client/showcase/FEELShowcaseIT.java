@@ -35,6 +35,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import static org.junit.Assert.assertEquals;
 
+@Ignore
 public class FEELShowcaseIT {
 
     private static final String INDEX_HTML = "target/kie-dmn-feel-gwt-showcase/index.html";
