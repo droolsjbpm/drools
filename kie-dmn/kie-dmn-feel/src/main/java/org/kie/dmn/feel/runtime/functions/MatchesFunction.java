@@ -18,6 +18,7 @@ package org.kie.dmn.feel.runtime.functions;
 
 import org.kie.dmn.api.feel.runtime.events.FEELEvent.Severity;
 import org.kie.dmn.feel.runtime.events.InvalidParametersEvent;
+import org.kie.dmn.feel.util.RegexpUtil;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,10 +43,11 @@ public class MatchesFunction
             return FEELFnResult.ofError( new InvalidParametersEvent( Severity.ERROR, "pattern", "cannot be null" ) );
         }
         try {
-            int f = processFlags( flags );
-            Pattern p = Pattern.compile( pattern, f );
-            Matcher m = p.matcher( input );
-            return FEELFnResult.ofResult( m.find() );
+            return FEELFnResult.ofResult( RegexpUtil.find(input, pattern, flags));
+//            int f = processFlags( flags );
+//            Pattern p = Pattern.compile( pattern, f );
+//            Matcher m = p.matcher( input );
+//            return FEELFnResult.ofResult( m.find() );
         } catch ( PatternSyntaxException e ) {
             return FEELFnResult.ofError( new InvalidParametersEvent( Severity.ERROR, "pattern", "is invalid and can not be compiled", e ) );
         } catch ( IllegalArgumentException t ) {
