@@ -16,13 +16,12 @@
 
 package org.kie.dmn.feel.runtime.functions;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.kie.dmn.api.feel.runtime.events.FEELEvent.Severity;
 import org.kie.dmn.feel.runtime.events.InvalidParametersEvent;
+import org.kie.dmn.feel.util.RegexpUtil;
 
 public class SplitFunction
         extends BaseFEELFunction {
@@ -44,10 +43,7 @@ public class SplitFunction
             return FEELFnResult.ofError( new InvalidParametersEvent( Severity.ERROR, "delimiter", "cannot be null" ) );
         }
         try {
-            int f = processFlags( flags );
-            Pattern p = Pattern.compile( delimiter, f );
-            String[] split = p.split(string, -1);
-            return FEELFnResult.ofResult( Arrays.asList( split ) );
+            return FEELFnResult.ofResult(RegexpUtil.split(string, delimiter, flags));
         } catch ( PatternSyntaxException e ) {
             return FEELFnResult.ofError( new InvalidParametersEvent( Severity.ERROR, "delimiter", "is invalid and can not be compiled", e ) );
         } catch ( IllegalArgumentException t ) {
@@ -57,20 +53,5 @@ public class SplitFunction
         }
     }
 
-    private int processFlags(String flags) {
-        int f = 0;
-        if( flags != null ) {
-            if( flags.contains( "s" ) ) {
-                f |= Pattern.DOTALL;
-            }
-            if( flags.contains( "m" ) ) {
-                f |= Pattern.MULTILINE;
-            }
-            if( flags.contains( "i" ) ) {
-                f |= Pattern.CASE_INSENSITIVE;
-            }
-        }
-        return f;
-    }
 
 }
