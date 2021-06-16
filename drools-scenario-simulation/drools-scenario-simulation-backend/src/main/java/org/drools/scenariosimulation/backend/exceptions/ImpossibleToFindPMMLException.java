@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2021 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.drools.scenariosimulation.backend.exceptions;
 
-package org.drools.scenariosimulation.backend.util;
+public class ImpossibleToFindPMMLException extends IllegalArgumentException {
 
-/**
- * Utility that provide classPath scan to retrieve resources
- */
-public class ImpossibleToFindDMNException extends IllegalArgumentException {
-
-    public ImpossibleToFindDMNException(String message) {
+    public ImpossibleToFindPMMLException(String message) {
         super(message);
     }
 
-    public ImpossibleToFindDMNException(String message, Throwable cause) {
+    public ImpossibleToFindPMMLException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public ImpossibleToFindDMNException(Throwable cause) {
+    public ImpossibleToFindPMMLException(Throwable cause) {
         super(cause.getMessage(), cause);
     }
 }

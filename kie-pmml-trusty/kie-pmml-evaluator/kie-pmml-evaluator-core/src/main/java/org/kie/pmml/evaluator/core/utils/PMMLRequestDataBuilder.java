@@ -25,7 +25,13 @@ public class PMMLRequestDataBuilder {
 
     private String correlationId;
     private String modelName;
+    private String source;
     private List<ParameterInfo<?>> parameters;
+
+    public PMMLRequestDataBuilder(String correlationId, String modelName, String source) {
+        this(correlationId, modelName);
+        this.source = source;
+    }
 
     public PMMLRequestDataBuilder(String correlationId, String modelName) {
         this.correlationId = correlationId;
@@ -41,6 +47,9 @@ public class PMMLRequestDataBuilder {
     public PMMLRequestData build() {
         PMMLRequestData data = new PMMLRequestData(correlationId, modelName);
         parameters.forEach(data::addRequestParam);
+        if (source != null) {
+            data.setSource(source);
+        }
         return data;
     }
 }

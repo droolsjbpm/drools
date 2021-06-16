@@ -163,6 +163,8 @@ public class ScenarioSimulationXMLPersistence {
                 migrator = migrator.andThen(getMigrationStrategy().from1_6to1_7());
             case "1.7":
                 migrator = migrator.andThen(getMigrationStrategy().from1_7to1_8());
+            case "1.8":
+                migrator = migrator.andThen(getMigrationStrategy().from1_8to1_9());
                 supported = true;
                 break;
             default:

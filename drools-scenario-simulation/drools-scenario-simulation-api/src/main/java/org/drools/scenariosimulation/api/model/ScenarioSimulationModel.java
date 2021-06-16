@@ -25,11 +25,12 @@ public class ScenarioSimulationModel
 
     public enum Type {
         RULE,
-        DMN
+        DMN,
+        PMML
     }
 
     @XStreamAsAttribute()
-    private String version = "1.8";
+    private String version = "1.9";
 
     private Simulation simulation;
 

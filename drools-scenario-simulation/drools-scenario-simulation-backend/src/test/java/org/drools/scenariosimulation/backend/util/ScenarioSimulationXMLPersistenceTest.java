@@ -271,6 +271,24 @@ public class ScenarioSimulationXMLPersistenceTest {
         commonCheckFactMappingValueType(document, BACKGROUND_NODE);
     }
 
+    @Test
+    public void migrateIfNecessary_1_8_to_1_9() throws Exception {
+        String toMigrate = getFileContent("scesim-1-8-dmn.scesim");
+        Document document = DOMParserUtil.getDocument(toMigrate);
+        migrationInstance.from1_8to1_9().accept(document);
+        commonCheck(toMigrate, document, "1.9");
+        commonCheckBackground(document);
+        commonCheckFactMappingValueType(document, SIMULATION_NODE);
+        commonCheckFactMappingValueType(document, BACKGROUND_NODE);
+        toMigrate = getFileContent("scesim-1-8-rule.scesim");
+        document = DOMParserUtil.getDocument(toMigrate);
+        migrationInstance.from1_8to1_9().accept(document);
+        commonCheck(toMigrate, document, "1.9");
+        commonCheckBackground(document);
+        commonCheckFactMappingValueType(document, SIMULATION_NODE);
+        commonCheckFactMappingValueType(document, BACKGROUND_NODE);
+    }
+
     private void commonCheckFactMappingValueType(Document document, String scesimModel) {
         List<Node> factMappingsNodes = DOMParserUtil.getNestedChildrenNodesList(document, scesimModel, SIMULATION_DESCRIPTOR_NODE, FACT_MAPPINGS_NODE);
         assertNotNull(factMappingsNodes);
@@ -328,6 +346,14 @@ public class ScenarioSimulationXMLPersistenceTest {
         String toUnmarshal = getFileContent("scesim-dmn.scesim");
         final ScenarioSimulationModel retrieved = ScenarioSimulationXMLPersistence.getInstance().unmarshal(toUnmarshal);
         assertEquals(ScenarioSimulationModel.Type.DMN, retrieved.getSettings().getType());
+        commonCheckSimulation(retrieved);
+    }
+
+    @Test
+    public void unmarshalPMML() throws Exception {
+        String toUnmarshal = getFileContent("scesim-pmml.scesim");
+        final ScenarioSimulationModel retrieved = ScenarioSimulationXMLPersistence.getInstance().unmarshal(toUnmarshal);
+        assertEquals(ScenarioSimulationModel.Type.PMML, retrieved.getSettings().getType());
         commonCheckSimulation(retrieved);
     }
 

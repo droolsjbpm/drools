@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.drools.scenariosimulation.backend.exceptions.ImpossibleToFindDMNException;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieRuntimeFactory;
 import org.kie.dmn.api.core.DMNModel;

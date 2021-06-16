@@ -76,7 +76,18 @@
       <artifactId>kie-dmn-core</artifactId>
     </dependency>
 
+    <!-- PMML dependencies -->
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-pmml-dependencies</artifactId>
+    </dependency>
+
     <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-test-util</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>

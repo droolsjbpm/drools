@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.assertj.core.api.Assertions;
+import org.drools.scenariosimulation.backend.exceptions.ImpossibleToFindDMNException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.io.Resource;

@@ -24,6 +24,8 @@ public class Settings {
 
     private String dmnFilePath;
 
+    private String pmmlFilePath;
+
     private ScenarioSimulationModel.Type type;
 
     private String fileName;
@@ -37,6 +39,8 @@ public class Settings {
     private String dmnNamespace;
 
     private String dmnName;
+
+    private String pmmlModelName;
 
     private boolean skipFromBuild = false;
     private boolean stateless = false;
@@ -55,6 +59,14 @@ public class Settings {
 
     public void setDmnFilePath(String dmnFilePath) {
         this.dmnFilePath = dmnFilePath;
+    }
+
+    public String getPmmlFilePath() {
+        return pmmlFilePath;
+    }
+
+    public void setPmmlFilePath(String pmmlFilePath) {
+        this.pmmlFilePath = pmmlFilePath;
     }
 
     public ScenarioSimulationModel.Type getType() {
@@ -135,6 +147,14 @@ public class Settings {
 
     public void setDmnName(String dmnName) {
         this.dmnName = dmnName;
+    }
+
+    public String getPmmlModelName() {
+        return pmmlModelName;
+    }
+
+    public void setPmmlModelName(String pmmlModelName) {
+        this.pmmlModelName = pmmlModelName;
     }
 
     public boolean isSkipFromBuild() {

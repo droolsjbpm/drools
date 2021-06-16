@@ -1,9 +1,10 @@
-<ScenarioSimulationModel version="1.9">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<ScenarioSimulationModel version="1.8">
   <simulation>
     <simulationDescriptor>
       <factMappings>
         <FactMapping>
-          <expressionElements/>
+          <expressionElements class="linked-list"/>
           <expressionIdentifier>
             <name>Index</name>
             <type>OTHER</type>
@@ -14,9 +15,11 @@
           </factIdentifier>
           <className>java.lang.Integer</className>
           <factAlias>#</factAlias>
+          <columnWidth>70.0</columnWidth>
+          <factMappingValueType>NOT_EXPRESSION</factMappingValueType>
         </FactMapping>
         <FactMapping>
-          <expressionElements/>
+          <expressionElements class="linked-list"/>
           <expressionIdentifier>
             <name>Description</name>
             <type>OTHER</type>
@@ -27,9 +30,11 @@
           </factIdentifier>
           <className>java.lang.String</className>
           <factAlias>Scenario description</factAlias>
+          <columnWidth>300.0</columnWidth>
+          <factMappingValueType>NOT_EXPRESSION</factMappingValueType>
         </FactMapping>
         <FactMapping>
-          <expressionElements/>
+          <expressionElements class="linked-list"/>
           <expressionIdentifier>
             <name>0|1</name>
             <type>GIVEN</type>
@@ -41,9 +46,11 @@
           <className>java.lang.Void</className>
           <factAlias>INSTANCE 1</factAlias>
           <expressionAlias>PROPERTY 1</expressionAlias>
+          <columnWidth>114.0</columnWidth>
+          <factMappingValueType>NOT_EXPRESSION</factMappingValueType>
         </FactMapping>
         <FactMapping>
-          <expressionElements/>
+          <expressionElements class="linked-list"/>
           <expressionIdentifier>
             <name>0|2</name>
             <type>EXPECT</type>
@@ -52,10 +59,12 @@
           <className>java.lang.Void</className>
           <factAlias>INSTANCE 2</factAlias>
           <expressionAlias>PROPERTY 2</expressionAlias>
+          <columnWidth>114.0</columnWidth>
+          <factMappingValueType>NOT_EXPRESSION</factMappingValueType>
         </FactMapping>
       </factMappings>
     </simulationDescriptor>
-    <scenarios>
+    <scenarios class="linked-list">
       <Scenario>
         <factMappingValues>
           <FactMappingValue>
@@ -70,21 +79,54 @@
             <factIdentifier reference="../../../../../simulationDescriptor/factMappings/FactMapping[3]/factIdentifier"/>
             <expressionIdentifier reference="../../../../../simulationDescriptor/factMappings/FactMapping[4]/expressionIdentifier"/>
           </FactMappingValue>
-          <FactMappingValue>
-            <factIdentifier reference="../../../../../simulationDescriptor/factMappings/FactMapping/factIdentifier"/>
-            <expressionIdentifier reference="../../../../../simulationDescriptor/factMappings/FactMapping/expressionIdentifier"/>
-            <rawValue class="string">1</rawValue>
-          </FactMappingValue>
         </factMappingValues>
         <simulationDescriptor reference="../../../simulationDescriptor"/>
       </Scenario>
     </scenarios>
   </simulation>
-  <settings>
-    <dmoSession></dmoSession>
-    <type>RULE</type>
-  </settings>
   <imports>
     <imports/>
   </imports>
+  <settings>
+    <dmoSession>default</dmoSession>
+    <type>RULE</type>
+    <skipFromBuild>false</skipFromBuild>
+  </settings>
+  <background>
+    <simulationDescriptor>
+      <factMappings>
+        <FactMapping>
+          <factMappingValueType>NOT_EXPRESSION</factMappingValueType>
+          <expressionElements class="linked-list"/>
+          <expressionIdentifier>
+            <name>1|1</name>
+            <type>GIVEN</type>
+          </expressionIdentifier>
+          <factIdentifier>
+            <name>Empty</name>
+            <className>java.lang.Void</className>
+          </factIdentifier>
+          <className>java.lang.Void</className>
+          <factAlias>Instance 1</factAlias>
+          <expressionAlias>PROPERTY 1</expressionAlias>
+        </FactMapping>
+      </factMappings>
+    </simulationDescriptor>
+    <scesimData class="linked-list">
+      <BackgroundData>
+        <factMappingValues>
+          <FactMappingValue>
+            <factIdentifier>
+              <name>Empty</name>
+              <className>java.lang.Void</className>
+            </factIdentifier>
+            <expressionIdentifier>
+              <name>1|1</name>
+              <type>GIVEN</type>
+            </expressionIdentifier>
+          </FactMappingValue>
+        </factMappingValues>
+      </BackgroundData>
+    </scesimData>
+  </background>
 </ScenarioSimulationModel>

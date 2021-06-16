@@ -1,0 +1,38 @@
+<PMML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="4.2" xsi:schemaLocation="http://www.dmg.org/PMML-4_2 http://www.dmg.org/v4-2-1/pmml-4-2.xsd" xmlns="http://www.dmg.org/PMML-4_2">
+  <Header/>
+  <DataDictionary numberOfFields="3">
+    <DataField name="result" optype="continuous" dataType="double"/>
+    <DataField name="x" optype="categorical" dataType="string">
+      <Value value="red"/>
+      <Value value="green"/>
+      <Value value="blue"/>
+      <Value value="orange"/>
+      <Value value="yellow"/>
+    </DataField>
+    <DataField name="y" optype="categorical" dataType="string">
+      <Value value="classA"/>
+      <Value value="classB"/>
+      <Value value="classC"/>
+    </DataField>
+  </DataDictionary>
+  <RegressionModel modelName="CategoricalVariablesRegression" functionName="regression">
+    <MiningSchema>
+      <MiningField name="result" usageType="predicted" invalidValueTreatment="returnInvalid"/>
+      <MiningField name="x" usageType="active" invalidValueTreatment="returnInvalid"/>
+      <MiningField name="y" usageType="active" invalidValueTreatment="returnInvalid"/>
+    </MiningSchema>
+    <Output>
+      <OutputField name="Predicted_result" optype="continuous" dataType="double" feature="predictedValue"/>
+    </Output>
+    <RegressionTable intercept="-22.1">
+      <CategoricalPredictor name="x" value="red" coefficient="5.5"/>
+      <CategoricalPredictor name="x" value="green" coefficient="15"/>
+      <CategoricalPredictor name="x" value="blue" coefficient="12"/>
+      <CategoricalPredictor name="x" value="orange" coefficient="5.5"/>
+      <CategoricalPredictor name="x" value="yellow" coefficient="-100.25"/>
+      <CategoricalPredictor name="y" value="classA" coefficient="0"/>
+      <CategoricalPredictor name="y" value="classB" coefficient="20"/>
+      <CategoricalPredictor name="y" value="classC" coefficient="40"/>
+    </RegressionTable>
+  </RegressionModel>
+</PMML>

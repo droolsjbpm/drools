@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<ScenarioSimulationModel version="1.8">
+  <simulation>
+    <simulationDescriptor>
+      <factMappings>
+        <FactMapping>
+          <expressionElements class="linked-list"/>
+          <expressionIdentifier>
+            <name>Index</name>
+            <type>OTHER</type>
+          </expressionIdentifier>
+          <factIdentifier>
+            <name>#</name>
+            <className>java.lang.Integer</className>
+          </factIdentifier>
+          <className>java.lang.Integer</className>
+          <factAlias>#</factAlias>
+          <columnWidth>70.0</columnWidth>
+          <factMappingValueType>NOT_EXPRESSION</factMappingValueType>
+        </FactMapping>
+        <FactMapping>
+          <expressionElements class="linked-list"/>
+          <expressionIdentifier>
+            <name>Description</name>
+            <type>OTHER</type>
+          </expressionIdentifier>
+          <factIdentifier>
+            <name>Scenario description</name>
+            <className>java.lang.String</className>
+          </factIdentifier>
+          <className>java.lang.String</className>
+          <factAlias>Scenario description</factAlias>
+          <columnWidth>300.0</columnWidth>
+          <factMappingValueType>NOT_EXPRESSION</factMappingValueType>
+        </FactMapping>
+        <FactMapping>
+          <expressionElements class="linked-list">
+            <ExpressionElement>
+              <step>person</step>
+            </ExpressionElement>
+            <ExpressionElement>
+              <step>address</step>
+            </ExpressionElement>
+          </expressionElements>
+          <expressionIdentifier>
+            <name>0|1</name>
+            <type>GIVEN</type>
+          </expressionIdentifier>
+          <factIdentifier>
+            <name>person</name>
+            <className>person</className>
+          </factIdentifier>
+          <className>java.util.List</className>
+          <factAlias>person</factAlias>
+          <expressionAlias>address</expressionAlias>
+          <genericTypes class="singleton-list">
+            <string>address</string>
+          </genericTypes>
+          <columnWidth>114.0</columnWidth>
+          <factMappingValueType>NOT_EXPRESSION</factMappingValueType>
+        </FactMapping>
+        <FactMapping>
+          <expressionElements class="linked-list">
+            <ExpressionElement>
+              <step>person</step>
+            </ExpressionElement>
+            <ExpressionElement>
+              <step>age</step>
+            </ExpressionElement>
+          </expressionElements>
+          <expressionIdentifier>
+            <name>0|2</name>
+            <type>GIVEN</type>
+          </expressionIdentifier>
+          <factIdentifier>
+            <name>person</name>
+            <className>person</className>
+          </factIdentifier>
+          <className>age</className>
+          <factAlias>person</factAlias>
+          <expressionAlias>age</expressionAlias>
+          <genericTypes/>
+          <columnWidth>114.0</columnWidth>
+          <factMappingValueType>NOT_EXPRESSION</factMappingValueType>
+        </FactMapping>
+        <FactMapping>
+          <expressionElements class="linked-list">
+            <ExpressionElement>
+              <step>is the first country European?</step>
+            </ExpressionElement>
+          </expressionElements>
+          <expressionIdentifier>
+            <name>0|3</name>
+            <type>EXPECT</type>
+          </expressionIdentifier>
+          <factIdentifier>
+            <name>is the first country European?</name>
+            <className>is the first country European?</className>
+          </factIdentifier>
+          <className>boolean</className>
+          <factAlias>is the first country European?</factAlias>
+          <expressionAlias>value</expressionAlias>
+          <genericTypes/>
+          <columnWidth>114.0</columnWidth>
+          <factMappingValueType>NOT_EXPRESSION</factMappingValueType>
+        </FactMapping>
+        <FactMapping>
+          <expressionElements class="linked-list">
+            <ExpressionElement>
+              <step>is young?</step>
+            </ExpressionElement>
+          </expressionElements>
+          <expressionIdentifier>
+            <name>0|4</name>
+            <type>EXPECT</type>
+          </expressionIdentifier>
+          <factIdentifier>
+            <name>is young?</name>
+            <className>is young?</className>
+          </factIdentifier>
+          <className>boolean</className>
+          <factAlias>is young?</factAlias>
+          <expressionAlias>value</expressionAlias>
+          <genericTypes/>
+          <columnWidth>114.0</columnWidth>
+          <factMappingValueType>NOT_EXPRESSION</factMappingValueType>
+        </FactMapping>
+      </factMappings>
+    </simulationDescriptor>
+    <scenarios class="linked-list">
+      <Scenario>
+        <factMappingValues>
+          <FactMappingValue>
+            <factIdentifier>
+              <name>Scenario description</name>
+              <className>java.lang.String</className>
+            </factIdentifier>
+            <expressionIdentifier>
+              <name>Description</name>
+              <type>OTHER</type>
+            </expressionIdentifier>
+          </FactMappingValue>
+          <FactMappingValue>
+            <factIdentifier>
+              <name>person</name>
+              <className>person</className>
+            </factIdentifier>
+            <expressionIdentifier>
+              <name>0|1</name>
+              <type>GIVEN</type>
+            </expressionIdentifier>
+          </FactMappingValue>
+          <FactMappingValue>
+            <factIdentifier>
+              <name>person</name>
+              <className>person</className>
+            </factIdentifier>
+            <expressionIdentifier>
+              <name>0|2</name>
+              <type>GIVEN</type>
+            </expressionIdentifier>
+          </FactMappingValue>
+          <FactMappingValue>
+            <factIdentifier>
+              <name>is the first country European?</name>
+              <className>is the first country European?</className>
+            </factIdentifier>
+            <expressionIdentifier>
+              <name>0|3</name>
+              <type>EXPECT</type>
+            </expressionIdentifier>
+          </FactMappingValue>
+          <FactMappingValue>
+            <factIdentifier>
+              <name>is young?</name>
+              <className>is young?</className>
+            </factIdentifier>
+            <expressionIdentifier>
+              <name>0|4</name>
+              <type>EXPECT</type>
+            </expressionIdentifier>
+          </FactMappingValue>
+        </factMappingValues>
+      </Scenario>
+    </scenarios>
+  </simulation>
+  <imports>
+    <imports/>
+  </imports>
+  <settings>
+    <dmnFilePath>src/main/resources/com/list.dmn</dmnFilePath>
+    <type>DMN</type>
+    <dmnNamespace>https://github.com/kiegroup/drools/kie-dmn/_CC8924B0-D729-4D70-9588-039B5824FFE9</dmnNamespace>
+    <dmnName>a1Collection</dmnName>
+    <skipFromBuild>false</skipFromBuild>
+    <stateless>false</stateless>
+  </settings>
+  <background>
+    <simulationDescriptor>
+      <factMappings>
+        <FactMapping>
+          <factMappingValueType>NOT_EXPRESSION</factMappingValueType>
+          <expressionElements class="linked-list"/>
+          <expressionIdentifier>
+            <name>1|1</name>
+            <type>GIVEN</type>
+          </expressionIdentifier>
+          <factIdentifier>
+            <name>Empty</name>
+            <className>java.lang.Void</className>
+          </factIdentifier>
+          <className>java.lang.Void</className>
+          <factAlias>Instance 1</factAlias>
+          <expressionAlias>PROPERTY 1</expressionAlias>
+        </FactMapping>
+      </factMappings>
+    </simulationDescriptor>
+    <scesimData class="linked-list">
+      <BackgroundData>
+        <factMappingValues>
+          <FactMappingValue>
+            <factIdentifier>
+              <name>Empty</name>
+              <className>java.lang.Void</className>
+            </factIdentifier>
+            <expressionIdentifier>
+              <name>1|1</name>
+              <type>GIVEN</type>
+            </expressionIdentifier>
+          </FactMappingValue>
+        </factMappingValues>
+      </BackgroundData>
+    </scesimData>
+  </background>
+</ScenarioSimulationModel>
