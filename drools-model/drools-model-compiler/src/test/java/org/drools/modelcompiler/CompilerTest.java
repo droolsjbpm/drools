@@ -2449,6 +2449,37 @@ public class CompilerTest extends BaseModelTest {
         assertThat(integerToShort).isEqualTo(new IntegerToShort(true, 1, (short)0));
     }
 
+    @Test // RHDM-1644
+    public void testUseOfVarCreatedAsInputArgInGlobalFuntionAsA_Var() {
+        String str =
+                "import " + IntegerToShort.class.getCanonicalName() + ";\n " +
+                "global " + GlobalFunctions.class.getCanonicalName() + " functions;\n " +
+                        "rule \"test_rule\"\n" +
+                        "dialect \"java\"\n" +
+                        "when\n" +
+                        "   $integerToShort : IntegerToShort( " +
+                        "           $testInt : testInt, " +
+                        "           testBoolean != null, " +
+                        "           testBoolean == false" +
+                        ") \n" +
+                        "then\n" +
+                        "   Object co = functions.getObject(); \n" +
+                        "   $integerToShort.setTestInt((int)Integer.valueOf(functions.getValue(co)));\n" +
+                        "   $integerToShort.setTestBoolean(true);\n" +
+                        "   update($integerToShort);\n" +
+                        "end";
+
+        KieSession ksession = getKieSession(str);
+        IntegerToShort integerToShort = new IntegerToShort(false, Short.MAX_VALUE, (short)0);
+
+        ksession.insert(integerToShort);
+        ksession.setGlobal("functions", new GlobalFunctions());
+        int rulesFired = ksession.fireAllRules();
+
+        Assert.assertEquals(1, rulesFired);
+        assertThat(integerToShort).isEqualTo(new IntegerToShort(true, 1, (short)0));
+    }
+
     @Test
     public void testConsequenceGetContext() throws Exception {
         String str =
