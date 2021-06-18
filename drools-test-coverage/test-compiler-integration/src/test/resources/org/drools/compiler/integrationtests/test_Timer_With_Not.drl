@@ -28,6 +28,7 @@ rule "insert A"
 timer(int: 1)
 when
 then
+    System.out.println("+++ Insert A");
     A a = new A();
     a.setId( (new Date()).toString() );
     insert( a );
@@ -40,6 +41,7 @@ when
     $a: A( $id: id )
     not B( a == $a )
 then
+    System.out.println("+++ Wrap A");
     B b = new B( $a );
     insert( b );
 end

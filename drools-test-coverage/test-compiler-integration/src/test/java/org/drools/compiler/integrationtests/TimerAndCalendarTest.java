@@ -1010,11 +1010,14 @@ public class TimerAndCalendarTest {
                                                                            "org/drools/compiler/integrationtests/test_Timer_With_Not.drl");
         final KieSession ksession = kbase.newKieSession();
         try {
+            System.out.println("+++ First fire ");
             ksession.fireAllRules();
-            Thread.sleep(200);
-            ksession.fireAllRules();
-            Thread.sleep(200);
-            ksession.fireAllRules();
+            Thread.sleep(1000);
+            System.out.println("+++ Waited 200ms, second fire ");
+            ksession.fireAllRules(); // fires insert A
+            Thread.sleep(2000);
+            System.out.println("+++ Waited 2000ms, Third fire fire ");
+            ksession.fireAllRules(); // fires Wrap A
             // now check that rule "wrap A" fired once, creating one B
             assertEquals(2, ksession.getFactCount());
         } finally {
@@ -1528,13 +1531,16 @@ public class TimerAndCalendarTest {
                 "  eval(true)" +
                 "  String( this == \"trigger\" )" +
                 "then \n" +
+                "  System.out.println(\"--- FireAtWill, adding 0 to list\");\n" +
                 "  list.add( 0 );\n" +
+                "  System.out.println(\"--- List is now: \" + list);\n" +
                 "end\n" +
                 "\n" +
                 "rule ImDone\n" +
                 "when\n" +
                 "  String( this == \"halt\" )\n" +
                 "then\n" +
+                "  System.out.println(\"--- ImDone drools halt\");\n" +
                 "  drools.halt();\n" +
                 "end\n" +
                 "\n";
@@ -1547,21 +1553,33 @@ public class TimerAndCalendarTest {
 
         final FactHandle handle = ksession.insert("trigger");
 
+        System.out.println("--- Starting fireUntilHalt");
         new Thread(ksession::fireUntilHalt).start();
         try {
+            System.out.println("--- Sleeping for 350ms");
             Thread.sleep(350);
+            System.out.println("--- Slept for 350ms");
+            System.out.println("--- Assert1 List " + list + " size is " + list.size());
             assertEquals(2, list.size()); // delay 0, repeat after 100
             assertEquals(asList(0, 0), list);
 
             ksession.insert("halt");
 
+            System.out.println("--- Sleeping for 200ms");
             Thread.sleep(200);
+            System.out.println("--- Slept for 200ms");
             ksession.delete(handle);
+            System.out.println("--- Deleted trigger");
+            System.out.println("--- List " + list + " size is " + list.size());
             assertEquals(2, list.size()); // halted, no more rule firing
+            System.out.println("--- Assert1 List " + list + " size is " + list.size());
 
+            System.out.println("--- Starting fireUntilHalt new thread");
             new Thread(ksession::fireUntilHalt).start();
             try {
+                System.out.println("--- Sleeping for 200ms");
                 Thread.sleep(200);
+                System.out.println("--- Slept for 200ms");
 
                 assertEquals(2, list.size());
                 assertEquals(asList(0, 0), list);
