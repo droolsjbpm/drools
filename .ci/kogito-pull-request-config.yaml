@@ -1,48 +1,46 @@
-version: "2.0"
+version: "2.1"
 
 dependencies: ./kogito-project-dependencies.yaml
 
+pre: |
+  export BUILD_MVN_OPTS="${{ env.BUILD_MVN_OPTS }} -nsu -fae -e -Dgwt.skipCompilation=true -Dgwt.compiler.skip=true -Denforcer.skip=true -Dcheckstyle.skip=true -Dspotbugs.skip=true -Drevapi.skip=true -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120"
+  echo "BUILD_MVN_OPTS=${{ env.BUILD_MVN_OPTS }}"
+
 default:
   build-command:
-    upstream: mvn -e clean install -DskipTests -Dgwt.compiler.skip=true -Dgwt.skipCompilation=true -Denforcer.skip=true -Dcheckstyle.skip=true -Dspotbugs.skip=true -Drevapi.skip=true -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
+    current: mvn clean install -DskipTests -Dquickly ${{ env.BUILD_MVN_OPTS }}
 
 build:
   - project: kiegroup/drools
     build-command:
       current: |
         export DROOLS_VERSION=`mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout`
-        mvn -e -nsu clean install -Dmaven.test.failure.ignore=true -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
+        mvn clean install -DskipTests -Dquickly ${{ env.BUILD_MVN_OPTS }}
 
   - project: kiegroup/kogito-runtimes
     build-command:
       current: |
-        mvn -f kogito-runtimes/pom.xml clean install -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3 -Dversion.org.kie7=${{ env.DROOLS_VERSION }}
-        mvn -f kogito-runtimes-integration-tests/pom.xml clean install -Pintegration-tests -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3 -Dversion.org.kie7=${{ env.DROOLS_VERSION }}
+        mvn -f kogito-runtimes/pom.xml clean install -Dversion.org.kie7=${{ env.DROOLS_VERSION }} ${{ env.BUILD_MVN_OPTS }}
     clone:
       - kogito-runtimes
-      - kogito-runtimes-integration-tests
 
   - project: kiegroup/kogito-apps
     build-command:
       current: |
-        mvn -f kogito-apps/pom.xml clean install -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
+        mvn -f kogito-apps/pom.xml clean install -DskipUI ${{ env.BUILD_MVN_OPTS }}
     clone:
       - kogito-apps
 
   - project: kiegroup/optaplanner
     build-command:
       current: |
-        mvn -f optaplanner/pom.xml clean install -Dversion.org.kie7=${{ env.DROOLS_VERSION }} -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
+        mvn -f optaplanner/pom.xml clean install -Dversion.org.kie7=${{ env.DROOLS_VERSION }} ${{ env.BUILD_MVN_OPTS }}
     clone:
       - optaplanner
 
   - project: kiegroup/kogito-examples
     build-command:
       current: |
-        mvn -f kogito-examples/pom.xml clean install -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
-        mvn -f kogito-examples-persistence/pom.xml clean install -Ppersistence -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
-        mvn -f kogito-examples-events/pom.xml clean install -Pevents -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
+        mvn -f kogito-examples/pom.xml clean install ${{ env.BUILD_MVN_OPTS }}
     clone:
       - kogito-examples
-      - kogito-examples-persistence
-      - kogito-examples-events

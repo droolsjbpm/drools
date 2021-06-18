@@ -1,9 +1,13 @@
 name: Kogito Build Chain Full Downstream
 
-on: [pull_request]
+on:
+  pull_request:
+    types: [ labeled ]
 
 jobs:
   build-chain:
+    if: ${{ github.event.label.name == 'Kogito downstream' }}
+    timeout-minutes: 240
     strategy:
       matrix:
         java-version: [11]
@@ -11,6 +15,23 @@ jobs:
     runs-on: ubuntu-latest
     name: Maven Build
     steps:
+      - name: Disk space report before modification
+        shell: bash
+        run: |
+          echo "Available storage:"
+          df -h
+      # Inspired to maximize-build-space action https://github.com/easimon/maximize-build-space
+      - name: Free disk space (remove dotnet, android and haskell)
+        shell: bash
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+      - name: Disk space report after modification
+        shell: bash
+        run: |
+          echo "Available storage:"
+          df -h
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
