@@ -20,6 +20,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 
+import org.dmg.pmml.FieldName;
+import org.dmg.pmml.OutputField;
+import org.dmg.pmml.ResultFeature;
 import org.drools.compiler.lang.api.DescrFactory;
 import org.drools.compiler.lang.api.PackageDescrBuilder;
 import org.drools.compiler.lang.api.RuleDescrBuilder;
@@ -164,7 +167,10 @@ public class KiePMMLDescrRhsFactoryTest {
         String statusToSet = "STATUSTOSET";
         String outputFieldName = "OUTPUTFIELDNAME";
         Object result = "RESULT";
-        List<KiePMMLOutputField> outputFields = Collections.singletonList(KiePMMLOutputField.builder(outputFieldName, null).withResultFeature(PREDICTED_VALUE).build());
+        OutputField outputField = new OutputField();
+        outputField.setName(FieldName.create(outputFieldName));
+        outputField.setResultFeature(ResultFeature.PREDICTED_VALUE);
+        List<OutputField> outputFields = Collections.singletonList(outputField);
         KiePMMLDroolsRule.Builder builder = KiePMMLDroolsRule.builder(ruleName, statusToSet, outputFields);
         KiePMMLDroolsRule rule = builder.build();
         StringJoiner joiner = new StringJoiner("");
@@ -206,8 +212,10 @@ public class KiePMMLDescrRhsFactoryTest {
     public void commonDeclareOutputFields() {
         String outputFieldName = "OUTPUTFIELDNAME";
         Object result = "RESULT";
-        List<KiePMMLOutputField> outputFields = Collections.singletonList(KiePMMLOutputField.builder(outputFieldName, null).withResultFeature(PREDICTED_VALUE).build());
-        StringJoiner joiner = new StringJoiner("");
+        OutputField outputField = new OutputField();
+        outputField.setName(FieldName.create(outputFieldName));
+        outputField.setResultFeature(ResultFeature.PREDICTED_VALUE);
+        List<OutputField> outputFields = Collections.singletonList(outputField); StringJoiner joiner = new StringJoiner("");
         KiePMMLDescrRhsFactory.factory(ruleBuilder).commonDeclareOutputFields(outputFields, result, joiner);
         String retrieved = joiner.toString();
         String expected = String.format(ADD_PMML4_OUTPUT_FIELD, outputFieldName, result);

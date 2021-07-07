@@ -6,6 +6,10 @@
     <DataField name="score" optype="continuous" dataType="double"/>
   </DataDictionary>
   <TransformationDictionary>
+    <DefineFunction name="norm_discrete_function" optype="categorical" dataType="string">
+      <ParameterField name="eval_reason"/>
+      <NormDiscrete field="eval_reason" value="Input1ReasonCode" />
+    </DefineFunction>
     <DefineFunction name="fun_input1_fieldref" optype="continuous" dataType="double">
       <ParameterField name="input1_fake"/>
       <FieldRef field="input1_fake"/>
@@ -54,6 +58,11 @@
       </OutputField>
       <OutputField name="out_normcontinuous_field" feature="transformedValue" dataType="double" optype="continuous">
         <FieldRef field="normcontinuous_field"/>
+      </OutputField>
+      <OutputField name="out_normdiscrete_field" feature="transformedValue" dataType="string" optype="categorical">
+        <Apply function="norm_discrete_function" >
+          <FieldRef field="Reason Code 1"/>
+        </Apply>
       </OutputField>
     </Output>
     <Characteristics>

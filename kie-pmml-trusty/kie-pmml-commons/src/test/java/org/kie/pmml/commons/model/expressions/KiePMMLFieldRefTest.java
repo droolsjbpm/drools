@@ -22,6 +22,7 @@ import java.util.List;
 import org.junit.Test;
 import org.kie.pmml.api.enums.DATA_TYPE;
 import org.kie.pmml.api.enums.OP_TYPE;
+import org.kie.pmml.commons.model.ProcessingDTO;
 import org.kie.pmml.commons.model.tuples.KiePMMLNameValue;
 import org.kie.pmml.commons.transformations.KiePMMLDerivedField;
 
@@ -38,8 +39,8 @@ public class KiePMMLFieldRefTest {
         final List<KiePMMLNameValue> kiePMMLNameValues = Collections.singletonList(new KiePMMLNameValue(FIELD_NAME,
                                                                                                         value));
         final KiePMMLFieldRef kiePMMLFieldRef = new KiePMMLFieldRef(FIELD_NAME, Collections.emptyList(), null);
-        final Object retrieved = kiePMMLFieldRef.evaluate(Collections.emptyList(), Collections.emptyList(),  Collections.emptyList(),
-                                                          kiePMMLNameValues);
+        ProcessingDTO processingDTO = new ProcessingDTO(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), kiePMMLNameValues);
+        final Object retrieved = kiePMMLFieldRef.evaluate(processingDTO);
         assertEquals(value, retrieved);
     }
 
@@ -57,7 +58,8 @@ public class KiePMMLFieldRefTest {
         final List<KiePMMLNameValue> kiePMMLNameValues = Collections.singletonList(new KiePMMLNameValue("UNKNOWN",
                                                                                                         "WRONG"));
         final KiePMMLFieldRef kiePMMLFieldRef = new KiePMMLFieldRef(FIELD_NAME, Collections.emptyList(), null);
-        final Object retrieved = kiePMMLFieldRef.evaluate(Collections.emptyList(), derivedFields, Collections.emptyList(), kiePMMLNameValues);
+        ProcessingDTO processingDTO = new ProcessingDTO(Collections.emptyList(), derivedFields, Collections.emptyList(), kiePMMLNameValues);
+        final Object retrieved = kiePMMLFieldRef.evaluate(processingDTO);
         assertEquals(value, retrieved);
     }
 
@@ -75,7 +77,8 @@ public class KiePMMLFieldRefTest {
         final List<KiePMMLNameValue> kiePMMLNameValues = Collections.singletonList(new KiePMMLNameValue("UNKNOWN",
                                                                                                         "WRONG"));
         final KiePMMLFieldRef kiePMMLFieldRef = new KiePMMLFieldRef(FIELD_NAME, Collections.emptyList(), value);
-        final Object retrieved = kiePMMLFieldRef.evaluate(Collections.emptyList(), derivedFields, Collections.emptyList(), kiePMMLNameValues);
+        ProcessingDTO processingDTO = new ProcessingDTO(Collections.emptyList(), derivedFields, Collections.emptyList(), kiePMMLNameValues);
+        final Object retrieved = kiePMMLFieldRef.evaluate(processingDTO);
         assertEquals(value, retrieved);
     }
 
@@ -92,7 +95,8 @@ public class KiePMMLFieldRefTest {
         final List<KiePMMLNameValue> kiePMMLNameValues = Collections.singletonList(new KiePMMLNameValue("UNKNOWN",
                                                                                                         "WRONG"));
         final KiePMMLFieldRef kiePMMLFieldRef = new KiePMMLFieldRef(FIELD_NAME, Collections.emptyList(), null);
-        final Object retrieved = kiePMMLFieldRef.evaluate(Collections.emptyList(), derivedFields, Collections.emptyList(), kiePMMLNameValues);
+        ProcessingDTO processingDTO = new ProcessingDTO(Collections.emptyList(), derivedFields, Collections.emptyList(), kiePMMLNameValues);
+        final Object retrieved = kiePMMLFieldRef.evaluate(processingDTO);
         assertNull(retrieved);
     }
 }

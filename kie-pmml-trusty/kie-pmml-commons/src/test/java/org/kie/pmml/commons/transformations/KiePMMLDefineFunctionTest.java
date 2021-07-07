@@ -16,11 +16,13 @@
 
 package org.kie.pmml.commons.transformations;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.Test;
 import org.kie.pmml.api.enums.OP_TYPE;
+import org.kie.pmml.commons.model.ProcessingDTO;
 import org.kie.pmml.commons.model.expressions.KiePMMLApply;
 import org.kie.pmml.commons.model.expressions.KiePMMLConstant;
 import org.kie.pmml.commons.model.expressions.KiePMMLFieldRef;
@@ -37,26 +39,35 @@ public class KiePMMLDefineFunctionTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void evaluateNoParamValues() {
-        final KiePMMLParameterField parameterField1 = KiePMMLParameterField.builder(PARAM_1, Collections.emptyList()).build();
-        final KiePMMLParameterField parameterField2 = KiePMMLParameterField.builder(PARAM_2, Collections.emptyList()).build();
-        final KiePMMLDefineFunction defineFunction = new KiePMMLDefineFunction(CUSTOM_FUNCTION, Collections.emptyList(),
-                                                                         OP_TYPE.CONTINUOUS.getName(),
-                                                                         Arrays.asList(parameterField1,
-                                                                                       parameterField2),
-                                                                               null);
-        defineFunction.evaluate(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(),null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void evaluateEmptyParamValues() {
-        final KiePMMLParameterField parameterField1 = KiePMMLParameterField.builder(PARAM_1, Collections.emptyList()).build();
-        final KiePMMLParameterField parameterField2 = KiePMMLParameterField.builder(PARAM_2, Collections.emptyList()).build();
+        final KiePMMLParameterField parameterField1 =
+                KiePMMLParameterField.builder(PARAM_1, Collections.emptyList()).build();
+        final KiePMMLParameterField parameterField2 =
+                KiePMMLParameterField.builder(PARAM_2, Collections.emptyList()).build();
         final KiePMMLDefineFunction defineFunction = new KiePMMLDefineFunction(CUSTOM_FUNCTION, Collections.emptyList(),
                                                                                OP_TYPE.CONTINUOUS.getName(),
                                                                                Arrays.asList(parameterField1,
                                                                                              parameterField2),
                                                                                null);
-        defineFunction.evaluate(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+        ProcessingDTO processingDTO = new ProcessingDTO(Collections.emptyList(), Collections.emptyList(),
+                                                        Collections.emptyList(), Collections.emptyList());
+        defineFunction.evaluate(processingDTO, null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void evaluateEmptyParamValues() {
+        final KiePMMLParameterField parameterField1 = KiePMMLParameterField.builder(PARAM_1, Collections.emptyList
+        ()).build();
+        final KiePMMLParameterField parameterField2 = KiePMMLParameterField.builder(PARAM_2, Collections.emptyList
+        ()).build();
+        final KiePMMLDefineFunction defineFunction = new KiePMMLDefineFunction(CUSTOM_FUNCTION, Collections
+        .emptyList(),
+                                                                               OP_TYPE.CONTINUOUS.getName(),
+                                                                               Arrays.asList(parameterField1,
+                                                                                             parameterField2),
+                                                                               null);
+        ProcessingDTO processingDTO = new ProcessingDTO(Collections.emptyList(), Collections.emptyList(),
+                                                        Collections.emptyList(), Collections.emptyList());
+        defineFunction.evaluate(processingDTO, Collections.emptyList());
     }
 
     @Test
@@ -69,7 +80,9 @@ public class KiePMMLDefineFunctionTest {
                                                                                OP_TYPE.CONTINUOUS.getName(),
                                                                                Collections.emptyList(),
                                                                                kiePMMLConstant1);
-        Object retrieved = defineFunction.evaluate(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+        ProcessingDTO processingDTO = new ProcessingDTO(Collections.emptyList(), Collections.emptyList(),
+                                                        Collections.emptyList(), Collections.emptyList());
+        Object retrieved = defineFunction.evaluate(processingDTO, Collections.emptyList());
         assertEquals(value1, retrieved);
     }
 
@@ -84,7 +97,9 @@ public class KiePMMLDefineFunctionTest {
                                                                                OP_TYPE.CONTINUOUS.getName(),
                                                                                Collections.singletonList(KiePMMLParameterField.builder(PARAM_1, Collections.emptyList()).build()),
                                                                                kiePMMLFieldRef);
-        Object retrieved = defineFunction.evaluate(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.singletonList(value1));
+        ProcessingDTO processingDTO = new ProcessingDTO(Collections.emptyList(), Collections.emptyList(),
+                                                        Collections.emptyList(), new ArrayList<>());
+        Object retrieved = defineFunction.evaluate(processingDTO, Collections.singletonList(value1));
         assertEquals(value1, retrieved);
     }
 
@@ -103,13 +118,18 @@ public class KiePMMLDefineFunctionTest {
         final KiePMMLApply kiePMMLApply = KiePMMLApply.builder("NAME", Collections.emptyList(), "/")
                 .withKiePMMLExpressions(Arrays.asList(kiePMMLFieldRef1, kiePMMLFieldRef2))
                 .build();
-        final KiePMMLParameterField parameterField1 = KiePMMLParameterField.builder(PARAM_1, Collections.emptyList()).build();
-        final KiePMMLParameterField parameterField2 = KiePMMLParameterField.builder(PARAM_2, Collections.emptyList()).build();
+        final KiePMMLParameterField parameterField1 =
+                KiePMMLParameterField.builder(PARAM_1, Collections.emptyList()).build();
+        final KiePMMLParameterField parameterField2 =
+                KiePMMLParameterField.builder(PARAM_2, Collections.emptyList()).build();
         final KiePMMLDefineFunction defineFunction = new KiePMMLDefineFunction(CUSTOM_FUNCTION, Collections.emptyList(),
                                                                                OP_TYPE.CONTINUOUS.getName(),
-                                                                               Arrays.asList(parameterField1, parameterField2),
+                                                                               Arrays.asList(parameterField1,
+                                                                                             parameterField2),
                                                                                kiePMMLApply);
-        Object retrieved = defineFunction.evaluate(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Arrays.asList(value1, value2));
+        ProcessingDTO processingDTO = new ProcessingDTO(Collections.emptyList(), Collections.emptyList(),
+                                                        Collections.emptyList(), new ArrayList<>());
+        Object retrieved = defineFunction.evaluate(processingDTO, Arrays.asList(value1, value2));
         Object expected = value1 / value2;
         assertEquals(expected, retrieved);
     }

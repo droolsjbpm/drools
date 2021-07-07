@@ -19,6 +19,10 @@
     <DataField name="class" optype="continuous" dataType="string"/>
   </DataDictionary>
   <TransformationDictionary>
+    <DefineFunction name="norm_discrete_function" optype="categorical" dataType="string">
+      <ParameterField name="eval_class"/>
+      <NormDiscrete field="eval_class" value="1" />
+    </DefineFunction>
     <DerivedField name="normcontinuous_field" optype="continuous" dataType="double">
       <NormContinuous field="sepal_length">
         <LinearNorm orig="4.7" norm="5.2"/>
@@ -37,8 +41,16 @@
       <MiningField name="class" usageType="predicted"/>
     </MiningSchema>
     <Output>
+      <OutputField name="out_class" feature="predictedValue" dataType="string" optype="categorical">
+        <FieldRef field="class"/>
+      </OutputField>
       <OutputField name="out_normcontinuous_field" feature="transformedValue" dataType="double" optype="continuous">
         <FieldRef field="normcontinuous_field"/>
+      </OutputField>
+      <OutputField name="out_normdiscrete_field" feature="transformedValue" dataType="double" optype="continuous">
+        <Apply function="norm_discrete_function" >
+          <FieldRef field="out_class"/>
+        </Apply>
       </OutputField>
     </Output>
     <ComparisonMeasure kind="distance">

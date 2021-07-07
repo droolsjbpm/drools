@@ -16,10 +16,10 @@
 
 package org.kie.pmml.evaluator.core.utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -31,8 +31,10 @@ import org.kie.pmml.api.enums.OP_TYPE;
 import org.kie.pmml.api.enums.RESULT_FEATURE;
 import org.kie.pmml.api.enums.ResultCode;
 import org.kie.pmml.api.exceptions.KiePMMLException;
+import org.kie.pmml.commons.model.KiePMMLModel;
 import org.kie.pmml.commons.model.KiePMMLOutputField;
 import org.kie.pmml.commons.model.KiePMMLTarget;
+import org.kie.pmml.commons.model.ProcessingDTO;
 import org.kie.pmml.commons.model.expressions.KiePMMLApply;
 import org.kie.pmml.commons.model.expressions.KiePMMLConstant;
 import org.kie.pmml.commons.model.expressions.KiePMMLFieldRef;
@@ -78,13 +80,14 @@ public class PostProcessTest {
         toModify.setResultCode(ResultCode.FAIL.getName());
         toModify.addResultVariable(FIELD_NAME, 4.33);
         assertEquals(4.33, toModify.getResultVariables().get(FIELD_NAME));
-        PostProcess.executeTargets(toModify, model);
+        ProcessingDTO processingDTO = getProcessingDTO(model, new ArrayList(),  new ArrayList());
+        PostProcess.executeTargets(toModify, processingDTO);
         assertEquals(4.33, toModify.getResultVariables().get(FIELD_NAME));
         toModify.setResultCode(ResultCode.OK.getName());
-        PostProcess.executeTargets(toModify, model);
+        PostProcess.executeTargets(toModify, processingDTO);
         assertEquals(4.33, toModify.getResultVariables().get(FIELD_NAME));
         toModify.setResultObjectName(FIELD_NAME);
-        PostProcess.executeTargets(toModify, model);
+        PostProcess.executeTargets(toModify, processingDTO);
         assertEquals(4.34, toModify.getResultVariables().get(FIELD_NAME));
     }
 
@@ -101,7 +104,10 @@ public class PostProcessTest {
                 KiePMMLTestingModel.builder("TESTINGMODEL", Collections.emptyList(),
                                                                         MINING_FUNCTION.REGRESSION)
                         .build();
-        PostProcess.populatePredictedOutputField(outputField, toUpdate, kiePMMLModel, kiePMMLNameValues);
+        ProcessingDTO processingDTO = getProcessingDTO(kiePMMLModel, kiePMMLNameValues,  new ArrayList());
+        PostProcess.populatePredictedOutputField(outputField,
+                                                   toUpdate,
+                                                   processingDTO);
         assertTrue(toUpdate.getResultVariables().isEmpty());
         //
         final String targetField = "targetField";
@@ -112,7 +118,10 @@ public class PostProcessTest {
         final Object targetValue = 54346.32454;
         final KiePMMLNameValue kiePMMLNameValue = new KiePMMLNameValue(targetField, targetValue);
         kiePMMLNameValues.add(kiePMMLNameValue);
-        PostProcess.populatePredictedOutputField(outputField, toUpdate, kiePMMLModel, kiePMMLNameValues);
+        processingDTO = getProcessingDTO(kiePMMLModel, kiePMMLNameValues,  new ArrayList());
+        PostProcess.populatePredictedOutputField(outputField,
+                                                   toUpdate,
+                                                   processingDTO);
         assertFalse(toUpdate.getResultVariables().isEmpty());
         assertTrue(toUpdate.getResultVariables().containsKey(OUTPUT_NAME));
         assertEquals(kiePMMLNameValue.getValue(), toUpdate.getResultVariables().get(OUTPUT_NAME));
@@ -128,8 +137,10 @@ public class PostProcessTest {
                 KiePMMLTestingModel.builder("TESTINGMODEL", Collections.emptyList(),
                                                                         MINING_FUNCTION.REGRESSION)
                         .build();
-        PostProcess.populateTransformedOutputField(outputField, new PMML4Result(), kiePMMLModel,
-                                                   Collections.emptyList());
+        ProcessingDTO processingDTO = getProcessingDTO(kiePMMLModel, new ArrayList(),  new ArrayList());
+        PostProcess.populateTransformedOutputField(outputField,
+                                                   new PMML4Result(),
+                                                   processingDTO);
     }
 
     @Test
@@ -145,7 +156,10 @@ public class PostProcessTest {
                 KiePMMLTestingModel.builder("TESTINGMODEL", Collections.emptyList(),
                                                                         MINING_FUNCTION.REGRESSION)
                         .build();
-        PostProcess.populateTransformedOutputField(outputField, toUpdate, kiePMMLModel, kiePMMLNameValues);
+        ProcessingDTO processingDTO = getProcessingDTO(kiePMMLModel, kiePMMLNameValues,  new ArrayList());
+        PostProcess.populateTransformedOutputField(outputField,
+                                                   toUpdate,
+                                                   processingDTO);
         assertTrue(toUpdate.getResultVariables().isEmpty());
         //
         final String value = "String";
@@ -156,7 +170,11 @@ public class PostProcessTest {
                 .withResultFeature(RESULT_FEATURE.TRANSFORMED_VALUE)
                 .withKiePMMLExpression(kiePMMLConstant)
                 .build();
-        PostProcess.populateTransformedOutputField(outputField, toUpdate, kiePMMLModel, kiePMMLNameValues);
+
+        processingDTO = getProcessingDTO(kiePMMLModel, kiePMMLNameValues,  new ArrayList());
+        PostProcess.populateTransformedOutputField(outputField,
+                                                   toUpdate,
+                                                   processingDTO);
         assertFalse(toUpdate.getResultVariables().isEmpty());
         assertTrue(toUpdate.getResultVariables().containsKey(OUTPUT_NAME));
         assertEquals(kiePMMLConstant.getValue(), toUpdate.getResultVariables().get(OUTPUT_NAME));
@@ -172,12 +190,14 @@ public class PostProcessTest {
                 KiePMMLTestingModel.builder("TESTINGMODEL", Collections.emptyList(),
                                                                         MINING_FUNCTION.REGRESSION)
                         .build();
-        PostProcess.populateTransformedOutputField(outputField, new PMML4Result(), kiePMMLModel,
-                                                   Collections.emptyList());
+        ProcessingDTO processingDTO = getProcessingDTO(kiePMMLModel, new ArrayList(),  new ArrayList());
+        PostProcess.populateTransformedOutputField(outputField,
+                                                   new PMML4Result(),
+                                                   processingDTO);
     }
 
     @Test
-    public void populateTransformedOutputFieldWithApplyWithConsants() {
+    public void populateTransformedOutputFieldWithApplyWithConstants() {
         //     <Apply function="/">
         //        <Constant>100.0</Constant>
         //        <Constant>5.0</Constant>
@@ -199,10 +219,10 @@ public class PostProcessTest {
                 .withKiePMMLExpression(kiePMMLApply)
                 .build();
         final PMML4Result toUpdate = new PMML4Result();
+        ProcessingDTO processingDTO = getProcessingDTO(kiePMMLModel, new ArrayList(),  new ArrayList());
         PostProcess.populateTransformedOutputField(outputField,
                                                    toUpdate,
-                                                   kiePMMLModel,
-                                                   Collections.emptyList());
+                                                   processingDTO);
         assertFalse(toUpdate.getResultVariables().isEmpty());
         assertTrue(toUpdate.getResultVariables().containsKey(OUTPUT_NAME));
         Object expected = value1 / value2;
@@ -246,10 +266,10 @@ public class PostProcessTest {
                 .build();
         //
         PMML4Result toUpdate = new PMML4Result();
+        ProcessingDTO processingDTO = getProcessingDTO(kiePMMLModel, new ArrayList(),  new ArrayList());
         PostProcess.populateTransformedOutputField(outputField,
                                                    toUpdate,
-                                                   kiePMMLModel,
-                                                   Collections.emptyList());
+                                                   processingDTO);
         assertFalse(toUpdate.getResultVariables().isEmpty());
         assertTrue(toUpdate.getResultVariables().containsKey(OUTPUT_NAME));
         assertEquals(expected, toUpdate.getResultVariables().get(OUTPUT_NAME));
@@ -264,10 +284,10 @@ public class PostProcessTest {
                 .build();
         //
         toUpdate = new PMML4Result();
+        processingDTO = getProcessingDTO(kiePMMLModel, new ArrayList(),  new ArrayList());
         PostProcess.populateTransformedOutputField(outputField,
                                                    toUpdate,
-                                                   kiePMMLModel,
-                                                   Collections.emptyList());
+                                                   processingDTO);
         assertFalse(toUpdate.getResultVariables().isEmpty());
         assertTrue(toUpdate.getResultVariables().containsKey(OUTPUT_NAME));
         assertEquals(expected, toUpdate.getResultVariables().get(OUTPUT_NAME));
@@ -319,10 +339,10 @@ public class PostProcessTest {
                 .withKiePMMLExpression(kiePMMLApply)
                 .build();
         PMML4Result toUpdate = new PMML4Result();
+        ProcessingDTO processingDTO = getProcessingDTO(kiePMMLModel, new ArrayList(),  new ArrayList());
         PostProcess.populateTransformedOutputField(outputField,
                                                    toUpdate,
-                                                   kiePMMLModel,
-                                                   Collections.emptyList());
+                                                   processingDTO);
         assertFalse(toUpdate.getResultVariables().isEmpty());
         assertTrue(toUpdate.getResultVariables().containsKey(OUTPUT_NAME));
         assertEquals(expected, toUpdate.getResultVariables().get(OUTPUT_NAME));
@@ -337,10 +357,10 @@ public class PostProcessTest {
                 .build();
         //
         toUpdate = new PMML4Result();
+        processingDTO = getProcessingDTO(kiePMMLModel, new ArrayList(),  new ArrayList());
         PostProcess.populateTransformedOutputField(outputField,
                                                    toUpdate,
-                                                   kiePMMLModel,
-                                                   Collections.emptyList());
+                                                   processingDTO);
         assertFalse(toUpdate.getResultVariables().isEmpty());
         assertTrue(toUpdate.getResultVariables().containsKey(OUTPUT_NAME));
         assertEquals(expected, toUpdate.getResultVariables().get(OUTPUT_NAME));
@@ -388,10 +408,10 @@ public class PostProcessTest {
                 .withKiePMMLExpression(kiePMMLApply)
                 .build();
         PMML4Result toUpdate = new PMML4Result();
+        ProcessingDTO processingDTO = getProcessingDTO(kiePMMLModel, new ArrayList(),  new ArrayList());
         PostProcess.populateTransformedOutputField(outputField,
                                                    toUpdate,
-                                                   kiePMMLModel,
-                                                   Collections.emptyList());
+                                                   processingDTO);
         assertFalse(toUpdate.getResultVariables().isEmpty());
         assertTrue(toUpdate.getResultVariables().containsKey(OUTPUT_NAME));
         assertEquals(expected, toUpdate.getResultVariables().get(OUTPUT_NAME));
@@ -406,10 +426,10 @@ public class PostProcessTest {
                 .build();
         //
         toUpdate = new PMML4Result();
+        processingDTO = getProcessingDTO(kiePMMLModel, new ArrayList(),  new ArrayList());
         PostProcess.populateTransformedOutputField(outputField,
                                                    toUpdate,
-                                                   kiePMMLModel,
-                                                   Collections.emptyList());
+                                                   processingDTO);
         assertFalse(toUpdate.getResultVariables().isEmpty());
         assertTrue(toUpdate.getResultVariables().containsKey(OUTPUT_NAME));
         assertEquals(expected, toUpdate.getResultVariables().get(OUTPUT_NAME));
@@ -452,10 +472,10 @@ public class PostProcessTest {
                 .withKiePMMLExpression(kiePMMLApply)
                 .build();
         PMML4Result toUpdate = new PMML4Result();
+        ProcessingDTO processingDTO = getProcessingDTO(kiePMMLModel, new ArrayList(),  new ArrayList());
         PostProcess.populateTransformedOutputField(outputField,
                                                    toUpdate,
-                                                   kiePMMLModel,
-                                                   Collections.emptyList());
+                                                   processingDTO);
         assertFalse(toUpdate.getResultVariables().isEmpty());
         assertTrue(toUpdate.getResultVariables().containsKey(OUTPUT_NAME));
         assertEquals(expected, toUpdate.getResultVariables().get(OUTPUT_NAME));
@@ -506,10 +526,10 @@ public class PostProcessTest {
                 .withKiePMMLExpression(kiePMMLApply)
                 .build();
         PMML4Result toUpdate = new PMML4Result();
+        ProcessingDTO processingDTO = getProcessingDTO(kiePMMLModel, new ArrayList(),  new ArrayList());
         PostProcess.populateTransformedOutputField(outputField,
                                                    toUpdate,
-                                                   kiePMMLModel,
-                                                   Collections.emptyList());
+                                                   processingDTO);
         assertFalse(toUpdate.getResultVariables().isEmpty());
         assertTrue(toUpdate.getResultVariables().containsKey(OUTPUT_NAME));
         assertEquals(expected, toUpdate.getResultVariables().get(OUTPUT_NAME));
@@ -561,10 +581,10 @@ public class PostProcessTest {
                 .withKiePMMLExpression(kiePMMLApply)
                 .build();
         PMML4Result toUpdate = new PMML4Result();
+        ProcessingDTO processingDTO = getProcessingDTO(kiePMMLModel, new ArrayList<>(), new ArrayList());
         PostProcess.populateTransformedOutputField(outputField,
                                                    toUpdate,
-                                                   kiePMMLModel,
-                                                   Collections.emptyList());
+                                                   processingDTO);
         assertFalse(toUpdate.getResultVariables().isEmpty());
         assertTrue(toUpdate.getResultVariables().containsKey(OUTPUT_NAME));
         assertEquals(expected, toUpdate.getResultVariables().get(OUTPUT_NAME));
@@ -586,10 +606,10 @@ public class PostProcessTest {
                 .withKiePMMLExpression(kiePMMLConstant)
                 .build();
         PMML4Result toUpdate = new PMML4Result();
+        ProcessingDTO processingDTO = getProcessingDTO(kiePMMLModel, new ArrayList(),  new ArrayList());
         PostProcess.populateTransformedOutputField(outputField,
                                                    toUpdate,
-                                                   kiePMMLModel,
-                                                   Collections.emptyList());
+                                                   processingDTO);
         assertFalse(toUpdate.getResultVariables().isEmpty());
         assertTrue(toUpdate.getResultVariables().containsKey(OUTPUT_NAME));
         assertEquals(kiePMMLConstant.getValue(), toUpdate.getResultVariables().get(OUTPUT_NAME));
@@ -614,62 +634,18 @@ public class PostProcessTest {
                 .withKiePMMLExpression(kiePMMLFieldRef)
                 .build();
         PMML4Result toUpdate = new PMML4Result();
+        ProcessingDTO processingDTO = getProcessingDTO(kiePMMLModel, kiePMMLNameValues,  new ArrayList());
         PostProcess.populateTransformedOutputField(outputField,
                                                    toUpdate,
-                                                   kiePMMLModel,
-                                                   kiePMMLNameValues);
+                                                   processingDTO);
         assertFalse(toUpdate.getResultVariables().isEmpty());
         assertTrue(toUpdate.getResultVariables().containsKey(OUTPUT_NAME));
         assertEquals(variableValue, toUpdate.getResultVariables().get(OUTPUT_NAME));
     }
 
-    @Test
-    public void getValueFromKiePMMLNameValuesByVariableName() {
-        final String variableName = "variableName";
-        final List<KiePMMLNameValue> kiePMMLNameValues = IntStream.range(0, 3).mapToObj(i -> new KiePMMLNameValue(
-                "val-" + i, i)).collect(Collectors.toList());
-        Optional<Object> retrieved = PostProcess.getValueFromKiePMMLNameValuesByVariableName(variableName,
-                                                                                             kiePMMLNameValues);
-        assertFalse(retrieved.isPresent());
-        final Object variableValue = 243.94;
-        kiePMMLNameValues.add(new KiePMMLNameValue(variableName, variableValue));
-        retrieved = PostProcess.getValueFromKiePMMLNameValuesByVariableName(variableName, kiePMMLNameValues);
-        assertTrue(retrieved.isPresent());
-        assertEquals(variableValue, retrieved.get());
-    }
-
-    @Test
-    public void getValueFromPMMLResultByVariableName() {
-        final String variableName = "variableName";
-        final PMML4Result pmml4Result = new PMML4Result();
-        Optional<Object> retrieved = PostProcess.getValueFromPMMLResultByVariableName(variableName, pmml4Result);
-        assertFalse(retrieved.isPresent());
-        final Object variableValue = 243.94;
-        pmml4Result.addResultVariable(variableName, variableValue);
-        retrieved = PostProcess.getValueFromPMMLResultByVariableName(variableName, pmml4Result);
-        assertTrue(retrieved.isPresent());
-        assertEquals(variableValue, retrieved.get());
-    }
-
-    private List<KiePMMLDerivedField> getDerivedFields() {
-        // <DerivedField name="PARAM_1" optype="continuous" dataType="double">
-        //     <Constant>100.0</Constant>
-        // </DerivedField>
-        final KiePMMLConstant kiePMMLConstant1 = new KiePMMLConstant(PARAM_1, Collections.emptyList(), value1);
-        final KiePMMLDerivedField derivedField1 = KiePMMLDerivedField.builder(PARAM_1, Collections.emptyList(),
-                                                                              DATA_TYPE.DOUBLE.getName(),
-                                                                              OP_TYPE.CONTINUOUS.getName(),
-                                                                              kiePMMLConstant1)
-                .build();
-        // <DerivedField name="PARAM_1" optype="continuous" dataType="double">
-        //     <Constant>5.0</Constant>
-        // </DerivedField>
-        final KiePMMLConstant kiePMMLConstant2 = new KiePMMLConstant(PARAM_2, Collections.emptyList(), value2);
-        final KiePMMLDerivedField derivedField2 = KiePMMLDerivedField.builder(PARAM_2, Collections.emptyList(),
-                                                                              DATA_TYPE.DOUBLE.getName(),
-                                                                              OP_TYPE.CONTINUOUS.getName(),
-                                                                              kiePMMLConstant2)
-                .build();
-        return Arrays.asList(derivedField1, derivedField2);
+    private ProcessingDTO getProcessingDTO(final KiePMMLModel model,
+                                           final List<KiePMMLNameValue> kiePMMLNameValues,
+                                           final List<String> orderedReasonCodes) {
+        return new ProcessingDTO(model, kiePMMLNameValues, orderedReasonCodes);
     }
 }

@@ -34,6 +34,10 @@
     <DataField name="overallScore" optype="continuous" dataType="double"/>
   </DataDictionary>
   <TransformationDictionary>
+    <DefineFunction name="norm_discrete_function" optype="categorical" dataType="string">
+      <ParameterField name="eval_occupation"/>
+      <NormDiscrete field="eval_occupation" value="SKYDIVER" />
+    </DefineFunction>
     <DefineFunction name="fun_occupation_referred" optype="categorical" dataType="string">
       <ParameterField name="occupation_referred"/>
       <FieldRef field="occupation_referred"/>
@@ -77,6 +81,11 @@
       </OutputField>
       <OutputField name="out_normcontinuous_field" feature="transformedValue" dataType="double" optype="continuous">
         <FieldRef field="normcontinuous_field"/>
+      </OutputField>
+      <OutputField name="out_normdiscrete_field" feature="transformedValue" dataType="string" optype="categorical">
+        <Apply function="norm_discrete_function" >
+          <FieldRef field="occupation"/>
+        </Apply>
       </OutputField>
     </Output>
     <Targets>

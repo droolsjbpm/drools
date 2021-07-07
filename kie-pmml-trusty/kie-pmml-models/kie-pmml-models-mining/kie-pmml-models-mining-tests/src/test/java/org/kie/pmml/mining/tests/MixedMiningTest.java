@@ -41,6 +41,8 @@ public class MixedMiningTest extends AbstractPMMLTest {
     private static final String OUT_RESIDENCESTATE = "out_residenceState";
     private static final String OUT_FUN_OCCUPATION_REFERRED = "out_fun_occupation_referred";
     private static final String CONSTANT_OCCUPATION = "CONSTANT_OCCUPATION";
+    private static final String OUT_NORMDISCRETE_FIELD = "out_normdiscrete_field";
+
     private static PMMLRuntime pmmlRuntime;
 
     private String categoricalX;
@@ -106,5 +108,11 @@ public class MixedMiningTest extends AbstractPMMLTest {
         Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_RESIDENCESTATE)).isEqualTo(residenceState);
         Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_FUN_OCCUPATION_REFERRED)).isNotNull();
         Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_FUN_OCCUPATION_REFERRED)).isEqualTo(CONSTANT_OCCUPATION);
+        Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_NORMDISCRETE_FIELD)).isNotNull();
+        if (occupation.equals("SKYDIVER")) {
+            Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_NORMDISCRETE_FIELD)).isEqualTo(1.0);
+        } else {
+            Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_NORMDISCRETE_FIELD)).isEqualTo(0.0);
+        }
     }
 }

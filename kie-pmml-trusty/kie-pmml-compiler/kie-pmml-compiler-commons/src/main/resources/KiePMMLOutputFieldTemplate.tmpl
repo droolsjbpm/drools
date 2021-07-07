@@ -1,0 +1,21 @@
+package org.kie.pmml.compiler.commons;
+
+import java.util.Collections;
+
+import org.kie.pmml.commons.model.expressions.*;
+import org.kie.pmml.commons.model.KiePMMLOutputField;
+
+public class KiePMMLOutputFieldTemplate {
+
+
+    private KiePMMLOutputField getKiePMMLOutputField() {
+        KiePMMLOutputField outputField = KiePMMLOutputField.builder(name, Collections.emptyList())
+                        .withResultFeature(resultFeature)
+                        .withTargetField(targetField)
+                        .withValue(value)
+                        .withRank(rank)
+                        .withKiePMMLExpression(kiePMMLExpression)
+                        .build();
+    }
+
+}

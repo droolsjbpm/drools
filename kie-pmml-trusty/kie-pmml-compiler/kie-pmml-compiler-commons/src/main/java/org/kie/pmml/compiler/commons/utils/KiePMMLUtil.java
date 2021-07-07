@@ -84,6 +84,7 @@ public class KiePMMLUtil {
             populateMissingModelName(model, cleanedFileName, i);
             populateMissingOutputFieldDataType(model, dataFields);
             populateMissingMiningTargetField(model, dataFields);
+            populateMissingPredictedOutputFieldTarget(model);
             if (model instanceof MiningModel) {
                 populateCorrectMiningModel((MiningModel) model);
             }
@@ -125,6 +126,24 @@ public class KiePMMLUtil {
                 correctTargetFields(targetMiningField, model.getTargets());
             });
          }
+    }
+
+    /**
+     * Add the "targetField" attribute to "Predicted" OutputFields, if missing
+     * @param model
+     */
+    static void populateMissingPredictedOutputFieldTarget(final Model model) {
+        if (model.getOutput() != null && model.getMiningSchema() != null) {
+            Optional<OutputField> predictedOutputField = model.getOutput().getOutputFields().stream()
+                    .filter(outputField -> (outputField.getResultFeature() == null || outputField.getResultFeature().equals(ResultFeature.PREDICTED_VALUE)) && outputField.getTargetField() == null)
+                    .findFirst();
+            predictedOutputField.ifPresent(outputField -> {
+                List<MiningField> targetFields = getMiningTargetFields(model.getMiningSchema().getMiningFields());
+                if (!targetFields.isEmpty()) {
+                    outputField.setTargetField(targetFields.get(0).getName());
+                }
+            });
+        }
     }
 
     /**
@@ -223,6 +242,7 @@ public class KiePMMLUtil {
             Model model = segment.getModel();
             populateMissingSegmentModelName(model, segment.getId());
             populateMissingTargetFieldInSegment(miningModel.getMiningSchema(), model);
+            populateMissingPredictedOutputFieldTarget(model);
             if (model instanceof MiningModel) {
                 populateCorrectMiningModel((MiningModel) segment.getModel());
             }

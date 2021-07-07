@@ -13,24 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.kie.pmml.commons;
 
-package org.kie.pmml.commons.model.expressions;
+import java.util.List;
 
-import java.util.Collections;
-
-import org.junit.Test;
+import org.kie.pmml.commons.model.KiePMMLModel;
 import org.kie.pmml.commons.model.ProcessingDTO;
+import org.kie.pmml.commons.model.tuples.KiePMMLNameValue;
 
-import static org.junit.Assert.assertEquals;
+public class CommonTestingUtility {
 
-public class KiePMMLConstantTest {
-
-    @Test
-    public void evaluate() {
-        Object value = 234.45;
-        final KiePMMLConstant kiePMMLConstant = new KiePMMLConstant("NAME", Collections.emptyList(), value);
-        ProcessingDTO processingDTO = new ProcessingDTO(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
-        Object retrieved = kiePMMLConstant.evaluate(processingDTO);
-        assertEquals(value, retrieved);
+    public static ProcessingDTO getProcessingDTO(final KiePMMLModel model,
+                                           final List<KiePMMLNameValue> kiePMMLNameValues,
+                                           final List<String> orderedReasonCodes) {
+        return new ProcessingDTO(model, kiePMMLNameValues, orderedReasonCodes);
     }
+
 }

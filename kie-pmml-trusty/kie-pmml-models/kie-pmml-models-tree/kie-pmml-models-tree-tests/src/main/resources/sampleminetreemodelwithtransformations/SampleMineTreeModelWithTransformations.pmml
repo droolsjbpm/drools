@@ -14,6 +14,10 @@
     </DataField>
   </DataDictionary>
   <TransformationDictionary>
+    <DefineFunction name="norm_discrete_function" optype="categorical" dataType="string">
+      <ParameterField name="eval_decision"/>
+      <NormDiscrete field="eval_decision" value="umbrella" />
+    </DefineFunction>
     <DefineFunction name="fun_humidity_fieldref" optype="continuous" dataType="double">
       <ParameterField name="humidity_fake"/>
       <FieldRef field="humidity_fake"/>
@@ -36,7 +40,7 @@
       <Constant>constant</Constant>
     </DerivedField>
     <DerivedField name="normcontinuous_field" optype="continuous" dataType="double">
-      <NormContinuous field="temperature">
+      <NormContinuous field="humidity">
         <LinearNorm orig="4.7" norm="5.2"/>
         <LinearNorm orig="5.6" norm="5.9"/>
         <LinearNorm orig="6.4" norm="6.2"/>
@@ -63,6 +67,11 @@
       </OutputField>
       <OutputField name="out_normcontinuous_field" feature="transformedValue" dataType="double" optype="continuous">
         <FieldRef field="normcontinuous_field"/>
+      </OutputField>
+      <OutputField name="out_normdiscrete_field" feature="transformedValue" dataType="string" optype="categorical">
+        <Apply function="norm_discrete_function" >
+          <FieldRef field="decision"/>
+        </Apply>
       </OutputField>
     </Output>
     <Node score="nothing" id="1">

@@ -124,36 +124,6 @@ public class KiePMMLRegressionTableRegressionFactoryTest extends AbstractKiePMML
     }
 
     @Test
-    public void populateOutputFieldsMapWithResult() {
-        final List<KiePMMLOutputField> outputFields = new ArrayList<>();
-        KiePMMLOutputField predictedOutputField = getOutputField("KOF-TARGET", RESULT_FEATURE.PREDICTED_VALUE,
-                                                                 "TARGET");
-        outputFields.add(predictedOutputField);
-        final List<KiePMMLOutputField> probabilityOutputFields = IntStream.range(0, 2)
-                .mapToObj(index -> getOutputField("KOF-PROB-" + index, RESULT_FEATURE.PROBABILITY, "PROB-" + index))
-                .collect(Collectors.toList());
-        outputFields.addAll(probabilityOutputFields);
-        BlockStmt body = new BlockStmt();
-        KiePMMLRegressionTableRegressionFactory.populateOutputFieldsMapWithResult(body, outputFields);
-        NodeList<Statement> retrieved = body.getStatements();
-        assertEquals(1, retrieved.size());
-        assertTrue(retrieved.get(0) instanceof ExpressionStmt);
-        ExpressionStmt expressionStmt = (ExpressionStmt) retrieved.get(0);
-        assertTrue(expressionStmt.getExpression() instanceof MethodCallExpr);
-        MethodCallExpr methodCallExpr = (MethodCallExpr) expressionStmt.getExpression();
-        assertEquals("outputFieldsMap", methodCallExpr.getScope().get().asNameExpr().toString());
-        assertEquals("put", methodCallExpr.getName().asString());
-        NodeList<Expression> arguments = methodCallExpr.getArguments();
-        assertEquals(2, arguments.size());
-        assertTrue(arguments.get(0) instanceof StringLiteralExpr);
-        StringLiteralExpr stringLiteralExpr = (StringLiteralExpr)arguments.get(0);
-        assertEquals(predictedOutputField.getName(), stringLiteralExpr.asString());
-        assertTrue(arguments.get(1) instanceof NameExpr);
-        NameExpr nameExpr = (NameExpr)arguments.get(1);
-        assertEquals("result", nameExpr.getNameAsString());
-    }
-
-    @Test
     public void addNumericPredictorWithExponent() {
         String predictorName = "predictorName";
         int exponent = 2;

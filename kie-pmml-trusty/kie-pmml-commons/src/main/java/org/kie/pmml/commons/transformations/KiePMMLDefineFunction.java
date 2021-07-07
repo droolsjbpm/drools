@@ -19,11 +19,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.kie.pmml.api.enums.DATA_TYPE;
 import org.kie.pmml.api.enums.OP_TYPE;
 import org.kie.pmml.commons.model.KiePMMLExtension;
-import org.kie.pmml.commons.model.KiePMMLOutputField;
+import org.kie.pmml.commons.model.ProcessingDTO;
 import org.kie.pmml.commons.model.abstracts.AbstractKiePMMLComponent;
 import org.kie.pmml.commons.model.expressions.KiePMMLExpression;
 import org.kie.pmml.commons.model.tuples.KiePMMLNameValue;
@@ -62,9 +63,7 @@ public class KiePMMLDefineFunction extends AbstractKiePMMLComponent implements S
         return dataType;
     }
 
-    public Object evaluate(final List<KiePMMLDefineFunction> defineFunctions,
-                           final List<KiePMMLDerivedField> derivedFields,
-                           final List<KiePMMLOutputField> outputFields,
+    public Object evaluate(final ProcessingDTO processingDTO,
                            final List<Object> paramValues) {
         final List<KiePMMLNameValue> kiePMMLNameValues = new ArrayList<>();
         if (parameterFields != null) {
@@ -75,6 +74,9 @@ public class KiePMMLDefineFunction extends AbstractKiePMMLComponent implements S
                 kiePMMLNameValues.add(new KiePMMLNameValue(parameterFields.get(i).getName(), paramValues.get(i)));
             }
         }
-        return kiePMMLExpression.evaluate(defineFunctions, derivedFields, outputFields, kiePMMLNameValues);
+        for (KiePMMLNameValue kiePMMLNameValue : kiePMMLNameValues) {
+            processingDTO.addKiePMMLNameValue(kiePMMLNameValue);
+        }
+        return kiePMMLExpression.evaluate(processingDTO);
     }
 }

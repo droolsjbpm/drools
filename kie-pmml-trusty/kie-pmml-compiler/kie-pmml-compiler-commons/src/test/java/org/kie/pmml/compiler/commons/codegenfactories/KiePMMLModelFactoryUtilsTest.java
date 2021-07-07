@@ -155,29 +155,6 @@ public class KiePMMLModelFactoryUtilsTest {
     }
 
     @Test
-    public void addKiePMMLOutputFieldsPopulation() {
-        BlockStmt blockStmt = new BlockStmt();
-        List<KiePMMLOutputField> outputFields = IntStream.range(0, 3)
-                .mapToObj(index -> KiePMMLOutputField.builder("OUTPUTFIELD-" + index, Collections.emptyList())
-                        .withRank(new Random().nextInt(3))
-                        .withValue("VALUE-" + index)
-                        .withTargetField("TARGETFIELD-" + index)
-                        .build())
-                .collect(Collectors.toList());
-        KiePMMLModelFactoryUtils.addKiePMMLOutputFieldsPopulation(blockStmt, outputFields);
-        List<MethodCallExpr> retrieved = getMethodCallExprList(blockStmt, outputFields.size(), "kiePMMLOutputFields",
-                                                               "add");
-        for (KiePMMLOutputField outputField : outputFields) {
-            assertTrue(retrieved.stream()
-                               .filter(methodCallExpr -> methodCallExpr.getArguments().size() == 1)
-                               .map(methodCallExpr -> methodCallExpr.getArgument(0))
-                               .filter(Expression::isMethodCallExpr)
-                               .map(expressionArgument -> (MethodCallExpr) expressionArgument)
-                               .anyMatch(methodCallExpr -> evaluateKiePMMLOutputFieldPopulation(methodCallExpr, outputField)));
-        }
-    }
-
-    @Test
     public void addTransformationsInClassOrInterfaceDeclaration() {
         assertTrue(classOrInterfaceDeclaration.getMethodsByName("createTransformationDictionary").isEmpty());
         assertTrue(classOrInterfaceDeclaration.getMethodsByName("createLocalTransformations").isEmpty());
