@@ -76,7 +76,6 @@ public class KiePMMLNormContinuousFactoryTest {
                                                                               "%s);\n" +
                                                                               "}", variableName, fieldName,
                                                                       outlierString, mapMissingTo));
-        assertEquals(expected.toString(), retrieved.toString());
         assertTrue(JavaParserUtils.equalsNode(expected, retrieved));
         List<Class<?>> imports = Arrays.asList(Arrays.class, Collections.class, KiePMMLLinearNorm.class,
                                                KiePMMLNormContinuous.class, OUTLIER_TREATMENT_METHOD.class);

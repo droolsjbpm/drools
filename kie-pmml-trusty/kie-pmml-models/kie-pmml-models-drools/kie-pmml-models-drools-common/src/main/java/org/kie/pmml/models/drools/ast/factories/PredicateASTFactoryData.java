@@ -19,8 +19,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.dmg.pmml.OutputField;
 import org.dmg.pmml.Predicate;
-import org.kie.pmml.commons.model.KiePMMLOutputField;
 import org.kie.pmml.models.drools.ast.KiePMMLDroolsRule;
 import org.kie.pmml.models.drools.tuples.KiePMMLOriginalTypeGeneratedType;
 
@@ -30,14 +30,14 @@ import org.kie.pmml.models.drools.tuples.KiePMMLOriginalTypeGeneratedType;
 public class PredicateASTFactoryData {
 
     private final Predicate predicate;
-    private final List<KiePMMLOutputField> outputFields;
+    private final List<OutputField> outputFields;
     private final List<KiePMMLDroolsRule> rules;
     private final String parentPath;
     private final String currentRule;
     private final Map<String, KiePMMLOriginalTypeGeneratedType> fieldTypeMap;
 
     public PredicateASTFactoryData(Predicate predicate,
-                                   List<KiePMMLOutputField> outputFields,
+                                   List<OutputField> outputFields,
                                    List<KiePMMLDroolsRule> rules,
                                    String parentPath,
                                    String currentRule,
@@ -58,7 +58,7 @@ public class PredicateASTFactoryData {
         return predicate;
     }
 
-    public List<KiePMMLOutputField> getOutputFields() {
+    public List<OutputField> getOutputFields() {
         return outputFields;
     }
 

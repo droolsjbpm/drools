@@ -14,6 +14,21 @@
     </DataField>
   </DataDictionary>
   <TransformationDictionary>
+    <DefineFunction name="discretize_function" optype="categorical" dataType="string">
+      <ParameterField name="eval_temperature"/>
+      <Discretize field="eval_temperature" dataType="string" mapMissingTo="mapMissing" defaultValue="defaultValue">
+        <DiscretizeBin binValue="abc">
+          <Interval closure="openOpen" leftMargin="4.2" rightMargin="9.8"/>
+        </DiscretizeBin>
+        <DiscretizeBin binValue="def">
+          <Interval closure="closedOpen" leftMargin="15.4" rightMargin="32.1"/>
+        </DiscretizeBin>
+      </Discretize>
+    </DefineFunction>
+    <DefineFunction name="norm_discrete_function" optype="categorical" dataType="string">
+      <ParameterField name="eval_decision"/>
+      <NormDiscrete field="eval_decision" value="umbrella" />
+    </DefineFunction>
     <DefineFunction name="fun_humidity_fieldref" optype="continuous" dataType="double">
       <ParameterField name="humidity_fake"/>
       <FieldRef field="humidity_fake"/>
@@ -63,6 +78,35 @@
       </OutputField>
       <OutputField name="out_normcontinuous_field" feature="transformedValue" dataType="double" optype="continuous">
         <FieldRef field="normcontinuous_field"/>
+      </OutputField>
+      <OutputField name="out_normdiscrete_field" feature="transformedValue" dataType="string" optype="categorical">
+        <Apply function="norm_discrete_function" >
+          <FieldRef field="decision"/>
+        </Apply>
+      </OutputField>
+      <OutputField name="out_discretize_field" feature="transformedValue" dataType="string" optype="categorical">
+        <Apply function="discretize_function" >
+          <FieldRef field="temperature"/>
+        </Apply>
+      </OutputField>
+      <OutputField name="out_mapvalued_field" feature="transformedValue" dataType="string" optype="categorical">
+        <MapValues outputColumn="out" dataType="string">
+          <FieldColumnPair field="decision" column="decision"/>
+          <InlineTable>
+            <row>
+              <decision>sunglasses</decision>
+              <out>sun</out>
+            </row>
+            <row>
+              <decision>umbrella</decision>
+              <out>rain</out>
+            </row>
+            <row>
+              <decision>nothing</decision>
+              <out>dunno</out>
+            </row>
+          </InlineTable>
+        </MapValues>
       </OutputField>
     </Output>
     <Node score="nothing" id="1">

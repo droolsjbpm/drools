@@ -16,9 +16,24 @@
     <DataField name="petal_width" optype="continuous" dataType="double">
       <Interval closure="closedClosed" leftMargin="0.1" rightMargin="2.5"/>
     </DataField>
-    <DataField name="class" optype="continuous" dataType="string"/>
+    <DataField name="class" optype="categorical" dataType="string"/>
   </DataDictionary>
   <TransformationDictionary>
+    <DefineFunction name="discretize_function" optype="categorical" dataType="string">
+      <ParameterField name="eval_sepal_length"/>
+      <Discretize field="eval_sepal_length" dataType="string" mapMissingTo="mapMissing" defaultValue="defaultValue">
+        <DiscretizeBin binValue="abc">
+          <Interval closure="openOpen" leftMargin="4.7" rightMargin="5.2"/>
+        </DiscretizeBin>
+        <DiscretizeBin binValue="def">
+          <Interval closure="closedOpen" leftMargin="5.6" rightMargin="5.9"/>
+        </DiscretizeBin>
+      </Discretize>
+    </DefineFunction>
+    <DefineFunction name="norm_discrete_function" optype="categorical" dataType="string">
+      <ParameterField name="eval_class"/>
+      <NormDiscrete field="eval_class" value="1" />
+    </DefineFunction>
     <DerivedField name="normcontinuous_field" optype="continuous" dataType="double">
       <NormContinuous field="sepal_length">
         <LinearNorm orig="4.7" norm="5.2"/>
@@ -37,8 +52,44 @@
       <MiningField name="class" usageType="predicted"/>
     </MiningSchema>
     <Output>
+      <OutputField name="out_class" feature="predictedValue" dataType="string" optype="categorical">
+        <FieldRef field="class"/>
+      </OutputField>
       <OutputField name="out_normcontinuous_field" feature="transformedValue" dataType="double" optype="continuous">
         <FieldRef field="normcontinuous_field"/>
+      </OutputField>
+      <OutputField name="out_normdiscrete_field" feature="transformedValue" dataType="double" optype="continuous">
+        <Apply function="norm_discrete_function" >
+          <FieldRef field="out_class"/>
+        </Apply>
+      </OutputField>
+      <OutputField name="out_discretize_field" feature="transformedValue" dataType="string" optype="categorical">
+        <Apply function="discretize_function" >
+          <FieldRef field="sepal_length"/>
+        </Apply>
+      </OutputField>
+      <OutputField name="out_mapvalued_field" feature="transformedValue" dataType="string" optype="categorical">
+          <MapValues outputColumn="out" dataType="integer">
+            <FieldColumnPair field="class" column="class"/>
+            <InlineTable>
+              <row>
+                <class>1</class>
+                <out>virginica</out>
+              </row>
+              <row>
+                <class>2</class>
+                <out>versicolor</out>
+              </row>
+              <row>
+                <class>3</class>
+                <out>setosa</out>
+              </row>
+              <row>
+                <class>4</class>
+                <out>unknown</out>
+              </row>
+            </InlineTable>
+          </MapValues>
       </OutputField>
     </Output>
     <ComparisonMeasure kind="distance">

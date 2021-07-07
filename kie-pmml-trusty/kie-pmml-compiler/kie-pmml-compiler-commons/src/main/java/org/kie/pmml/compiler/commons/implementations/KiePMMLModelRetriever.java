@@ -77,7 +77,7 @@ public class KiePMMLModelRetriever {
                                                                       hasClassloader))
                 .map(kiePMMLModel -> getPopulatedWithPMMLModelFields(kiePMMLModel, dataDictionary,
                                                                      model.getMiningSchema(), model.getOutput()))
-                .map(kiePMMLModel -> getPopulatedWithKiePMMLOutputFields(kiePMMLModel, model.getOutput()))
+//                .map(kiePMMLModel -> getPopulatedWithKiePMMLOutputFields(kiePMMLModel, model.getOutput()))
                 .map(kiePMMLModel -> getPopulatedWithKiePMMLTargets(kiePMMLModel, model.getTargets()))
                 .findFirst();
     }
@@ -171,14 +171,14 @@ public class KiePMMLModelRetriever {
         return toPopulate;
     }
 
-    static KiePMMLModel getPopulatedWithKiePMMLOutputFields(final KiePMMLModel toPopulate,
-                                                            final Output output) {
-        if (output != null) {
-            final List<KiePMMLOutputField> converted = ModelUtils.convertToKiePMMLOutputFieldList(output);
-            toPopulate.setKiePMMLOutputFields(converted);
-        }
-        return toPopulate;
-    }
+//    static KiePMMLModel getPopulatedWithKiePMMLOutputFields(final KiePMMLModel toPopulate,
+//                                                            final Output output) {
+//        if (output != null) {
+//            final List<KiePMMLOutputField> converted = ModelUtils.convertToKiePMMLOutputFieldList(output);
+//            toPopulate.setKiePMMLOutputFields(converted);
+//        }
+//        return toPopulate;
+//    }
 
     static KiePMMLModel getPopulatedWithKiePMMLTargets(final KiePMMLModel toPopulate,
                                                        final Targets targets) {

@@ -6,6 +6,21 @@
     <DataField name="score" optype="continuous" dataType="double"/>
   </DataDictionary>
   <TransformationDictionary>
+    <DefineFunction name="discretize_function" optype="categorical" dataType="string">
+      <ParameterField name="eval_input1"/>
+      <Discretize field="eval_input1" dataType="string" mapMissingTo="mapMissing" defaultValue="defaultValue">
+        <DiscretizeBin binValue="abc">
+          <Interval closure="openOpen" leftMargin="4.2" rightMargin="9.8"/>
+        </DiscretizeBin>
+        <DiscretizeBin binValue="def">
+          <Interval closure="closedOpen" leftMargin="15.4" rightMargin="22.1"/>
+        </DiscretizeBin>
+      </Discretize>
+    </DefineFunction>
+    <DefineFunction name="norm_discrete_function" optype="categorical" dataType="string">
+      <ParameterField name="eval_reason"/>
+      <NormDiscrete field="eval_reason" value="Input1ReasonCode" />
+    </DefineFunction>
     <DefineFunction name="fun_input1_fieldref" optype="continuous" dataType="double">
       <ParameterField name="input1_fake"/>
       <FieldRef field="input1_fake"/>
@@ -54,6 +69,31 @@
       </OutputField>
       <OutputField name="out_normcontinuous_field" feature="transformedValue" dataType="double" optype="continuous">
         <FieldRef field="normcontinuous_field"/>
+      </OutputField>
+      <OutputField name="out_normdiscrete_field" feature="transformedValue" dataType="string" optype="categorical">
+        <Apply function="norm_discrete_function" >
+          <FieldRef field="Reason Code 1"/>
+        </Apply>
+      </OutputField>
+      <OutputField name="out_discretize_field" feature="transformedValue" dataType="string" optype="categorical">
+        <Apply function="discretize_function" >
+          <FieldRef field="input1"/>
+        </Apply>
+      </OutputField>
+      <OutputField name="out_mapvalued_field" feature="transformedValue" dataType="string" optype="categorical">
+        <MapValues outputColumn="out" dataType="string">
+          <FieldColumnPair field="Reason Code 1" column="reasoncode"/>
+          <InlineTable>
+            <row>
+              <reasoncode>Input1ReasonCode</reasoncode>
+              <out>RES-1</out>
+            </row>
+            <row>
+              <reasoncode>Input2ReasonCode</reasoncode>
+              <out>RES-2</out>
+            </row>
+          </InlineTable>
+        </MapValues>
       </OutputField>
     </Output>
     <Characteristics>

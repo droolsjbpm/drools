@@ -55,6 +55,44 @@
     <DerivedField name="StageThree" optype="continuous" dataType="double">
       <FieldRef field="StageTwo"/>
     </DerivedField>
+    <DerivedField name="mapvalued" dataType="double" optype="continuous" >
+      <MapValues outputColumn="out" dataType="integer">
+        <FieldColumnPair field="BAND" column="band"/>
+        <FieldColumnPair field="STATE" column="state"/>
+        <InlineTable>
+          <row>
+            <band>1</band>
+            <state>MN</state>
+            <out>10000</out>
+          </row>
+          <row>
+            <band>1</band>
+            <state>IL</state>
+            <out>12000</out>
+          </row>
+          <row>
+            <band>1</band>
+            <state>NY</state>
+            <out>20000</out>
+          </row>
+          <row>
+            <band>2</band>
+            <state>MN</state>
+            <out>20000</out>
+          </row>
+          <row>
+            <band>2</band>
+            <state>IL</state>
+            <out>23000</out>
+          </row>
+          <row>
+            <band>2</band>
+            <state>NY</state>
+            <out>30000</out>
+          </row>
+        </InlineTable>
+      </MapValues>
+    </DerivedField>
   </TransformationDictionary>
   <TreeModel modelName="IrisTreeModel" functionName="classification" algorithmName="rpart" splitCharacteristic="binarySplit" missingValueStrategy="defaultChild" noTrueChildStrategy="returnLastPrediction">
     <MiningSchema>

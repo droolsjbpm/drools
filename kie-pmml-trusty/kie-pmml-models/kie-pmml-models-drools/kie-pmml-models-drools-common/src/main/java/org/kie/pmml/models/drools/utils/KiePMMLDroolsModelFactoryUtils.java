@@ -33,6 +33,7 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import org.dmg.pmml.DataDictionary;
 import org.dmg.pmml.Model;
+import org.dmg.pmml.OutputField;
 import org.kie.pmml.api.exceptions.KiePMMLException;
 import org.kie.pmml.api.exceptions.KiePMMLInternalException;
 import org.kie.pmml.commons.model.KiePMMLOutputField;
@@ -46,9 +47,9 @@ import org.slf4j.LoggerFactory;
 
 import static org.kie.pmml.commons.Constants.MISSING_DEFAULT_CONSTRUCTOR;
 import static org.kie.pmml.commons.utils.KiePMMLModelUtils.getSanitizedClassName;
-import static org.kie.pmml.compiler.commons.factories.KiePMMLOutputFieldFactory.getOutputFields;
+//import static org.kie.pmml.compiler.commons.codegenfactories.KiePMMLOutputFieldFactory.getOutputFields;
 import static org.kie.pmml.compiler.commons.utils.JavaParserUtils.MAIN_CLASS_NOT_FOUND;
-import static org.kie.pmml.compiler.commons.codegenfactories.KiePMMLModelFactoryUtils.addKiePMMLOutputFieldsPopulation;
+//import static org.kie.pmml.compiler.commons.codegenfactories.KiePMMLModelFactoryUtils.addKiePMMLOutputFieldsPopulation;
 import static org.kie.pmml.compiler.commons.utils.ModelUtils.getTargetFieldName;
 
 /**
@@ -86,9 +87,9 @@ public class KiePMMLDroolsModelFactoryUtils {
         MINING_FUNCTION miningFunction = MINING_FUNCTION.byName(model.getMiningFunction().value());
         final ConstructorDeclaration constructorDeclaration = modelTemplate.getDefaultConstructor().orElseThrow(() -> new KiePMMLInternalException(String.format(MISSING_DEFAULT_CONSTRUCTOR, modelTemplate.getName())));
         String targetField = getTargetFieldName(dataDictionary, model).orElse(null);
-        List<KiePMMLOutputField> outputFields = getOutputFields(model);
+//        List<OutputField> outputFields = model.getOutput().getOutputFields();
         setConstructor(model, constructorDeclaration, modelTemplate.getName(), targetField, miningFunction);
-        addKiePMMLOutputFieldsPopulation(constructorDeclaration.getBody(), outputFields);
+//        addKiePMMLOutputFieldsPopulation(constructorDeclaration.getBody(), outputFields);
         addFieldTypeMapPopulation(constructorDeclaration.getBody(), fieldTypeMap);
         final MethodDeclaration getKModulePackageNameMethod = modelTemplate.getMethodsByName(GETKMODULEPACKAGENAME_METHOD).get(0);
         populateGetKModulePackageName(getKModulePackageNameMethod, packageName);

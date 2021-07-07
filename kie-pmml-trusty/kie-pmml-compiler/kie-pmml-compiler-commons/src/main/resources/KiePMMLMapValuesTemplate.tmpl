@@ -1,0 +1,19 @@
+package org.kie.pmml.compiler.commons;
+
+import java.util.Collections;
+
+
+public class KiePMMLMapValuesTemplate {
+
+
+    private KiePMMLMapValues getKiePMMLMapValues() {
+        KiePMMLMapValues mapValues = KiePMMLMapValues.builder("name", Collections.emptyList(), outputColumn)
+                                                     .withDefaultValue(defaultValue)
+                                                     .withMapMissingTo(mapMissingTo)
+                                                     .withDataType(dataType)
+                                                     .withKiePMMLInlineTable(inlineTable)
+                                                     .withKiePMMLFieldColumnPairs(Arrays.asList(fieldColumnPair1, fieldColumnPair2))
+                                                     .build();
+    }
+
+}

@@ -34,6 +34,21 @@
     <DataField name="overallScore" optype="continuous" dataType="double"/>
   </DataDictionary>
   <TransformationDictionary>
+    <DefineFunction name="discretize_function" optype="categorical" dataType="string">
+      <ParameterField name="eval_age"/>
+      <Discretize field="eval_age" dataType="string" mapMissingTo="mapMissing" defaultValue="defaultValue">
+        <DiscretizeBin binValue="abc">
+          <Interval closure="openOpen" leftMargin="4.2" rightMargin="30.5"/>
+        </DiscretizeBin>
+        <DiscretizeBin binValue="def">
+          <Interval closure="closedOpen" leftMargin="114" rightMargin="250"/>
+        </DiscretizeBin>
+      </Discretize>
+    </DefineFunction>
+    <DefineFunction name="norm_discrete_function" optype="categorical" dataType="string">
+      <ParameterField name="eval_occupation"/>
+      <NormDiscrete field="eval_occupation" value="SKYDIVER" />
+    </DefineFunction>
     <DefineFunction name="fun_occupation_referred" optype="categorical" dataType="string">
       <ParameterField name="occupation_referred"/>
       <FieldRef field="occupation_referred"/>
@@ -50,6 +65,33 @@
         <LinearNorm orig="6.4" norm="6.2"/>
         <LinearNorm orig="6.8" norm="6.7"/>
       </NormContinuous>
+    </DerivedField>
+    <DerivedField name="mapvalued_field" dataType="string" optype="categorical">
+      <MapValues outputColumn="out" dataType="string">
+        <FieldColumnPair field="categoricalX" column="reasoncode"/>
+        <InlineTable>
+          <row>
+            <reasoncode>red</reasoncode>
+            <out>der</out>
+          </row>
+          <row>
+            <reasoncode>green</reasoncode>
+            <out>neerg</out>
+          </row>
+          <row>
+            <reasoncode>blue</reasoncode>
+            <out>eulb</out>
+          </row>
+          <row>
+            <reasoncode>orange</reasoncode>
+            <out>egnaro</out>
+          </row>
+          <row>
+            <reasoncode>yellow</reasoncode>
+            <out>wolley</out>
+          </row>
+        </InlineTable>
+      </MapValues>
     </DerivedField>
   </TransformationDictionary>
   <MiningModel functionName="regression" modelName="MixedMining">
@@ -77,6 +119,19 @@
       </OutputField>
       <OutputField name="out_normcontinuous_field" feature="transformedValue" dataType="double" optype="continuous">
         <FieldRef field="normcontinuous_field"/>
+      </OutputField>
+      <OutputField name="out_normdiscrete_field" feature="transformedValue" dataType="string" optype="categorical">
+        <Apply function="norm_discrete_function" >
+          <FieldRef field="occupation"/>
+        </Apply>
+      </OutputField>
+      <OutputField name="out_discretize_field" feature="transformedValue" dataType="string" optype="categorical">
+        <Apply function="discretize_function" >
+          <FieldRef field="age"/>
+        </Apply>
+      </OutputField>
+      <OutputField name="out_mapvalued_field" feature="transformedValue" dataType="string" optype="categorical">
+        <FieldRef field="mapvalued_field"/>
       </OutputField>
     </Output>
     <Targets>

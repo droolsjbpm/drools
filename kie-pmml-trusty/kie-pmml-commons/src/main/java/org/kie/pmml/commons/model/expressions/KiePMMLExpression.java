@@ -16,20 +16,13 @@
 package org.kie.pmml.commons.model.expressions;
 
 import java.io.Serializable;
-import java.util.List;
 
-import org.kie.pmml.commons.model.KiePMMLOutputField;
-import org.kie.pmml.commons.model.tuples.KiePMMLNameValue;
-import org.kie.pmml.commons.transformations.KiePMMLDefineFunction;
-import org.kie.pmml.commons.transformations.KiePMMLDerivedField;
+import org.kie.pmml.commons.model.ProcessingDTO;
 
 /**
  * @see <a href=http://dmg.org/pmml/v4-4/Transformations.html#xsdGroup_EXPRESSION>EXPRESSION</a>
  */
 public interface KiePMMLExpression extends Serializable {
 
-    Object evaluate(final List<KiePMMLDefineFunction> defineFunctions,
-                    final List<KiePMMLDerivedField> derivedFields,
-                    final List<KiePMMLOutputField> outputFields,
-                    final List<KiePMMLNameValue> kiePMMLNameValues);
+    Object evaluate(final ProcessingDTO processingDTO);
 }

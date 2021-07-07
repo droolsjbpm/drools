@@ -16,17 +16,15 @@
 package org.kie.pmml.commons.model;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
-import java.util.stream.Stream;
 
-import org.kie.pmml.commons.model.abstracts.AbstractKiePMMLComponent;
 import org.kie.pmml.api.enums.RESULT_FEATURE;
+import org.kie.pmml.commons.model.abstracts.AbstractKiePMMLComponent;
 import org.kie.pmml.commons.model.expressions.KiePMMLExpression;
 import org.kie.pmml.commons.model.tuples.KiePMMLNameValue;
-import org.kie.pmml.commons.transformations.KiePMMLDefineFunction;
-import org.kie.pmml.commons.transformations.KiePMMLDerivedField;
 
 /**
  * @see <a href=http://dmg.org/pmml/v4-4/Output.html#xsdElement_OutputField>OutputField</a>
@@ -46,6 +44,19 @@ public class KiePMMLOutputField extends AbstractKiePMMLComponent {
 
     public static Builder builder(String name, List<KiePMMLExtension> extensions) {
         return new Builder(name, extensions);
+    }
+
+    static Optional<Object> getValueFromKiePMMLNameValuesByVariableName(final String variableName,
+                                                                        final List<KiePMMLNameValue> kiePMMLNameValues) {
+        return kiePMMLNameValues.stream()
+                .filter(kiePMMLNameValue -> kiePMMLNameValue.getName().equals(variableName))
+                .map(KiePMMLNameValue::getValue)
+                .findFirst();
+    }
+
+    static Optional<Object> getValueFromPMMLResultByVariableName(final String variableName,
+                                                                 final Map<String, Object> resultsVariables) {
+        return Optional.ofNullable(resultsVariables.get(variableName));
     }
 
     public RESULT_FEATURE getResultFeature() {
@@ -68,14 +79,41 @@ public class KiePMMLOutputField extends AbstractKiePMMLComponent {
         return kiePMMLExpression;
     }
 
-    public Object evaluate(final List<KiePMMLDefineFunction> defineFunctions,
-                           final List<KiePMMLDerivedField> derivedFields,
-                           final List<KiePMMLOutputField> outputFields,
-                           final List<KiePMMLNameValue> kiePMMLNameValues) {
-        return kiePMMLExpression != null ? kiePMMLExpression.evaluate(defineFunctions, derivedFields, outputFields, kiePMMLNameValues) : null;
+    public Object evaluate(final ProcessingDTO processingDTO) {
+        switch (resultFeature) {
+            case PREDICTED_VALUE:
+                return evaluatePredictedValue(processingDTO);
+            case REASON_CODE:
+                return evaluateReasonCodeValue(processingDTO);
+            case TRANSFORMED_VALUE:
+                return evaluateTransformedValue(processingDTO);
+            default:
+                return null;
+        }
     }
 
+    public Object evaluatePredictedValue(final ProcessingDTO processingDTO) {
+        return getValueFromKiePMMLNameValuesByVariableName(targetField, processingDTO.getKiePMMLNameValues())
+                .orElse(null);
+    }
 
+    public Object evaluateReasonCodeValue(final ProcessingDTO processingDTO) {
+        final List<String> orderedReasonCodes = processingDTO.getOrderedReasonCodes();
+        if (rank != null) {
+            int index = rank - 1;
+            String resultCode = null;
+            if (index < orderedReasonCodes.size()) {
+                resultCode = orderedReasonCodes.get(index);
+            }
+           return resultCode;
+        } else {
+            return null;
+        }
+    }
+
+    public Object evaluateTransformedValue(final ProcessingDTO processingDTO) {
+        return kiePMMLExpression != null ? kiePMMLExpression.evaluate(processingDTO) : null;
+    }
 
     @Override
     public String toString() {

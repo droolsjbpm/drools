@@ -1,0 +1,17 @@
+package org.kie.pmml.compiler.commons;
+
+import java.util.Collections;
+
+
+public class KiePMMLRowTemplate {
+
+
+    private KiePMMLRow getKiePMMLRow() {
+        Map<String, Object> columnValues = Stream.of(new Object[][] {
+             { "data1", 1 },
+             { "data2", 2 },
+         }).collect(Collectors.toMap(data -> (String) data[0], data -> data[1]));
+        KiePMMLRow row = new KiePMMLRow(columnValues);
+    }
+
+}

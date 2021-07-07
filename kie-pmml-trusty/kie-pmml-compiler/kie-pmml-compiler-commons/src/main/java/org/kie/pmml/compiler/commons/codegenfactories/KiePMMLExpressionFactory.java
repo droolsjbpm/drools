@@ -18,13 +18,19 @@ package org.kie.pmml.compiler.commons.codegenfactories;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import org.dmg.pmml.Apply;
 import org.dmg.pmml.Constant;
+import org.dmg.pmml.Discretize;
 import org.dmg.pmml.FieldRef;
+import org.dmg.pmml.MapValues;
 import org.dmg.pmml.NormContinuous;
+import org.dmg.pmml.NormDiscrete;
 
 import static org.kie.pmml.compiler.commons.codegenfactories.KiePMMLApplyFactory.getApplyVariableDeclaration;
 import static org.kie.pmml.compiler.commons.codegenfactories.KiePMMLConstantFactory.getConstantVariableDeclaration;
+import static org.kie.pmml.compiler.commons.codegenfactories.KiePMMLDiscretizeFactory.getDiscretizeVariableDeclaration;
 import static org.kie.pmml.compiler.commons.codegenfactories.KiePMMLFieldRefFactory.getFieldRefVariableDeclaration;
+import static org.kie.pmml.compiler.commons.codegenfactories.KiePMMLMapValuesFactory.getMapValuesVariableDeclaration;
 import static org.kie.pmml.compiler.commons.codegenfactories.KiePMMLNormContinuousFactory.getNormContinuousVariableDeclaration;
+import static org.kie.pmml.compiler.commons.codegenfactories.KiePMMLNormDiscreteFactory.getNormDiscreteVariableDeclaration;
 
 /**
  * Facade for actual implementations
@@ -42,10 +48,16 @@ public class KiePMMLExpressionFactory {
             return getApplyVariableDeclaration(variableName, (Apply) expression);
         } else if (expression instanceof Constant) {
             return getConstantVariableDeclaration(variableName, (Constant) expression);
+        } else if (expression instanceof Discretize) {
+            return getDiscretizeVariableDeclaration(variableName, (Discretize) expression);
         } else if (expression instanceof FieldRef) {
             return getFieldRefVariableDeclaration(variableName, (FieldRef) expression);
+        } else if (expression instanceof MapValues) {
+            return getMapValuesVariableDeclaration(variableName, (MapValues) expression);
         } else if (expression instanceof NormContinuous) {
             return getNormContinuousVariableDeclaration(variableName, (NormContinuous) expression);
+        } else if (expression instanceof NormDiscrete) {
+            return getNormDiscreteVariableDeclaration(variableName, (NormDiscrete) expression);
         } else {
             throw new IllegalArgumentException(String.format(EXPRESSION_NOT_MANAGED, expression.getClass()));
         }
