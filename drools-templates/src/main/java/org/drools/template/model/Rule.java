@@ -87,8 +87,12 @@ public class Rule extends AttributedDRLElement
         super.renderDRL(out);
 
         out.writeLine("\twhen");
+        //This line is added to include Rule Name in the When Clause
+        this._lhs = this._lhs.replace("drools.getRule().getName()",this._name)
         renderDRL(this._lhs, out);
         out.writeLine("\tthen");
+        //This line is added to include Rule Name in the Then Clause
+        this._rhs = this._rhs.replace("drools.getRule().getName()",this._name)
         renderDRL(this._rhs, out);
         out.writeLine("end\n");
     }
