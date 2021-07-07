@@ -18,15 +18,15 @@ package org.kie.pmml.models.drools.commons.factories;
 import java.util.List;
 import java.util.StringJoiner;
 
+import org.dmg.pmml.OutputField;
+import org.dmg.pmml.ResultFeature;
 import org.drools.compiler.lang.api.RuleDescrBuilder;
-import org.kie.pmml.commons.model.KiePMMLOutputField;
 import org.kie.pmml.models.drools.ast.KiePMMLDroolsRule;
 import org.kie.pmml.models.drools.tuples.KiePMMLReasonCodeAndValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.kie.pmml.commons.Constants.DONE;
-import static org.kie.pmml.api.enums.RESULT_FEATURE.PREDICTED_VALUE;
 
 /**
  * Class used to generate the <b>rhs</b> of a rule (descr) out of a <b>KiePMMLDroolsRule</b>
@@ -116,9 +116,9 @@ public class KiePMMLDescrRhsFactory {
         }
     }
 
-    protected void commonDeclareOutputFields(final List<KiePMMLOutputField> outputFields, final Object result, final StringJoiner joiner) {
+    protected void commonDeclareOutputFields(final List<OutputField> outputFields, final Object result, final StringJoiner joiner) {
         outputFields.forEach(kiePMMLOutputField -> {
-            if (PREDICTED_VALUE.equals(kiePMMLOutputField.getResultFeature())) {
+            if (ResultFeature.PREDICTED_VALUE.equals(kiePMMLOutputField.getResultFeature())) {
                 joiner.add(String.format(ADD_PMML4_OUTPUT_FIELD, kiePMMLOutputField.getName(), result));
             }
         });

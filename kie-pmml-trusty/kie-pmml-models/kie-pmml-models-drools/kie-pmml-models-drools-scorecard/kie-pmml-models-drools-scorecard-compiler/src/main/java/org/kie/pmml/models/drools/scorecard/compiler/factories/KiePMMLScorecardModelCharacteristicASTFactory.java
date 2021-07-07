@@ -20,19 +20,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.dmg.pmml.False;
+import org.dmg.pmml.OutputField;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.scorecard.Attribute;
 import org.dmg.pmml.scorecard.Characteristic;
 import org.dmg.pmml.scorecard.Characteristics;
 import org.drools.core.util.StringUtils;
-import org.kie.pmml.api.exceptions.KiePMMLException;
-import org.kie.pmml.commons.model.KiePMMLOutputField;
 import org.kie.pmml.api.enums.DATA_TYPE;
+import org.kie.pmml.api.enums.REASONCODE_ALGORITHM;
+import org.kie.pmml.api.exceptions.KiePMMLException;
 import org.kie.pmml.models.drools.ast.KiePMMLDroolsRule;
 import org.kie.pmml.models.drools.ast.factories.KiePMMLAbstractModelASTFactory;
 import org.kie.pmml.models.drools.ast.factories.KiePMMLPredicateASTFactory;
 import org.kie.pmml.models.drools.ast.factories.PredicateASTFactoryData;
-import org.kie.pmml.api.enums.REASONCODE_ALGORITHM;
 import org.kie.pmml.models.drools.tuples.KiePMMLOriginalTypeGeneratedType;
 import org.kie.pmml.models.drools.tuples.KiePMMLReasonCodeAndValue;
 import org.slf4j.Logger;
@@ -49,19 +49,19 @@ public class KiePMMLScorecardModelCharacteristicASTFactory {
     private static final Logger logger = LoggerFactory.getLogger(KiePMMLScorecardModelCharacteristicASTFactory.class.getName());
 
     private final Map<String, KiePMMLOriginalTypeGeneratedType> fieldTypeMap;
-    private final List<KiePMMLOutputField> outputFields;
+    private final List<OutputField> outputFields;
     private final DATA_TYPE targetType;
     private boolean useReasonCodes = false;
     private Number baselineScore;
     private REASONCODE_ALGORITHM reasonCodeAlgorithm;
 
-    private KiePMMLScorecardModelCharacteristicASTFactory(final Map<String, KiePMMLOriginalTypeGeneratedType> fieldTypeMap, final List<KiePMMLOutputField> outputFields, final DATA_TYPE targetType) {
+    private KiePMMLScorecardModelCharacteristicASTFactory(final Map<String, KiePMMLOriginalTypeGeneratedType> fieldTypeMap, final List<OutputField> outputFields, final DATA_TYPE targetType) {
         this.fieldTypeMap = fieldTypeMap;
         this.outputFields = outputFields;
         this.targetType = targetType;
     }
 
-    public static KiePMMLScorecardModelCharacteristicASTFactory factory(final Map<String, KiePMMLOriginalTypeGeneratedType> fieldTypeMap, final List<KiePMMLOutputField> outputFields, final DATA_TYPE targetType) {
+    public static KiePMMLScorecardModelCharacteristicASTFactory factory(final Map<String, KiePMMLOriginalTypeGeneratedType> fieldTypeMap, final List<OutputField> outputFields, final DATA_TYPE targetType) {
         return new KiePMMLScorecardModelCharacteristicASTFactory(fieldTypeMap, outputFields, targetType);
     }
 

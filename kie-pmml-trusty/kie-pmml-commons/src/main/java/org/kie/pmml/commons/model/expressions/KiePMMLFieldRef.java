@@ -19,11 +19,8 @@ import java.util.List;
 import java.util.Objects;
 
 import org.kie.pmml.commons.model.KiePMMLExtension;
-import org.kie.pmml.commons.model.KiePMMLOutputField;
+import org.kie.pmml.commons.model.ProcessingDTO;
 import org.kie.pmml.commons.model.abstracts.AbstractKiePMMLComponent;
-import org.kie.pmml.commons.model.tuples.KiePMMLNameValue;
-import org.kie.pmml.commons.transformations.KiePMMLDefineFunction;
-import org.kie.pmml.commons.transformations.KiePMMLDerivedField;
 
 import static org.kie.pmml.commons.model.expressions.ExpressionsUtils.getFromPossibleSources;
 
@@ -45,12 +42,8 @@ public class KiePMMLFieldRef extends AbstractKiePMMLComponent implements KiePMML
     }
 
     @Override
-    public Object evaluate(final List<KiePMMLDefineFunction> defineFunctions,
-                           final List<KiePMMLDerivedField> derivedFields,
-                           final List<KiePMMLOutputField> outputFields,
-                           final List<KiePMMLNameValue> kiePMMLNameValues) {
-
-        return getFromPossibleSources(name, defineFunctions, derivedFields, outputFields, kiePMMLNameValues)
+    public Object evaluate(final ProcessingDTO processingDTO) {
+        return getFromPossibleSources(name, processingDTO)
                 .orElse(mapMissingTo);
     }
 

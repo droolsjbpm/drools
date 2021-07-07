@@ -33,7 +33,6 @@ import org.kie.pmml.models.tests.AbstractPMMLTest;
 @RunWith(Parameterized.class)
 public class SimpleScorecardWithTransformationsTest extends AbstractPMMLTest {
 
-
     private static final String FILE_NAME = "SimpleScorecardWithTransformations.pmml";
     private static final String MODEL_NAME = "SimpleScorecardWithTransformations";
     private static final String TARGET_FIELD = "Score";
@@ -43,6 +42,8 @@ public class SimpleScorecardWithTransformationsTest extends AbstractPMMLTest {
     private static final String OUT_DER_INPUT2 = "out_der_input2";
     private static final String OUT_DER_CONSTANT = "out_der_constant";
     private static final String CONSTANT = "constant";
+    private static final String OUT_NORMDISCRETE_FIELD = "out_normdiscrete_field";
+    private static final String OUT_DISCRETIZE_FIELD = "out_discretize_field";
 
     private static PMMLRuntime pmmlRuntime;
 
@@ -91,5 +92,21 @@ public class SimpleScorecardWithTransformationsTest extends AbstractPMMLTest {
         Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_DER_INPUT1)).isEqualTo(input1);
         Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_DER_INPUT2)).isEqualTo(input2);
         Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_DER_CONSTANT)).isEqualTo(CONSTANT);
+        if (reasonCode1 != null) {
+            Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_NORMDISCRETE_FIELD)).isNotNull();
+            if (reasonCode1.equals("Input1ReasonCode")) {
+                Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_NORMDISCRETE_FIELD)).isEqualTo(1.0);
+            } else {
+                Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_NORMDISCRETE_FIELD)).isEqualTo(0.0);
+            }
+        }
+        Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_DISCRETIZE_FIELD)).isNotNull();
+        if (input1 > 4.2 && input1 < 9.8) {
+            Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_DISCRETIZE_FIELD)).isEqualTo("abc");
+        } else if (input1 >= 15.4 && input1 < 22.1) {
+            Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_DISCRETIZE_FIELD)).isEqualTo("def");
+        } else {
+            Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_DISCRETIZE_FIELD)).isEqualTo("defaultValue");
+        }
     }
 }

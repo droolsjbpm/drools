@@ -105,10 +105,6 @@ public abstract class KiePMMLModel extends AbstractKiePMMLComponent implements P
         this.outputFields = Collections.unmodifiableList(outputFields);
     }
 
-    public void setKiePMMLOutputFields(List<KiePMMLOutputField> kiePMMLOutputFields) {
-        this.kiePMMLOutputFields = Collections.unmodifiableList(kiePMMLOutputFields);
-    }
-
     public List<KiePMMLTarget> getKiePMMLTargets() {
         return kiePMMLTargets;
     }
@@ -118,7 +114,7 @@ public abstract class KiePMMLModel extends AbstractKiePMMLComponent implements P
     }
 
     public List<KiePMMLOutputField> getKiePMMLOutputFields() {
-        return Collections.unmodifiableList(kiePMMLOutputFields);
+        return kiePMMLOutputFields != null  ? Collections.unmodifiableList(kiePMMLOutputFields) : Collections.emptyList();
     }
 
     public KiePMMLTransformationDictionary getTransformationDictionary() {

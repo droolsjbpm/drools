@@ -10,6 +10,21 @@
     <DataField name="number_of_claims" optype="continuous" dataType="double"/>
   </DataDictionary>
   <TransformationDictionary>
+    <DefineFunction name="discretize_function" optype="categorical" dataType="string">
+      <ParameterField name="eval_age"/>
+      <Discretize field="eval_age" dataType="string" mapMissingTo="mapMissing" defaultValue="defaultValue">
+        <DiscretizeBin binValue="abc">
+          <Interval closure="openOpen" leftMargin="4.2" rightMargin="30.5"/>
+        </DiscretizeBin>
+        <DiscretizeBin binValue="def">
+          <Interval closure="closedOpen" leftMargin="114" rightMargin="250"/>
+        </DiscretizeBin>
+      </Discretize>
+    </DefineFunction>
+    <DefineFunction name="norm_discrete_function" optype="categorical" dataType="string">
+      <ParameterField name="eval_car_location"/>
+      <NormDiscrete field="eval_car_location" value="carpark" />
+    </DefineFunction>
     <DefineFunction name="fun_salary_fieldref" optype="continuous" dataType="double">
       <ParameterField name="salary_foo"/>
       <FieldRef field="salary_foo"/>
@@ -115,6 +130,16 @@
       </OutputField>
       <OutputField name="out_normcontinuous_field" feature="transformedValue" dataType="double" optype="continuous">
         <FieldRef field="normcontinuous_field"/>
+      </OutputField>
+      <OutputField name="out_normdiscrete_field" feature="transformedValue" dataType="string" optype="categorical">
+        <Apply function="norm_discrete_function" >
+          <FieldRef field="out_der_car_location"/>
+        </Apply>
+      </OutputField>
+      <OutputField name="out_discretize_field" feature="transformedValue" dataType="string" optype="categorical">
+        <Apply function="discretize_function" >
+          <FieldRef field="age"/>
+        </Apply>
       </OutputField>
     </Output>
     <Targets>

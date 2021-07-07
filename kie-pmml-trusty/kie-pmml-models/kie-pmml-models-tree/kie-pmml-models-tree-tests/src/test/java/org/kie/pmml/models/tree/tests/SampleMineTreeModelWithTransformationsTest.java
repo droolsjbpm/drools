@@ -35,16 +35,16 @@ import org.kie.pmml.models.tests.AbstractPMMLTest;
 @RunWith(Parameterized.class)
 public class SampleMineTreeModelWithTransformationsTest extends AbstractPMMLTest {
 
-
     private static final String FILE_NAME = "SampleMineTreeModelWithTransformations.pmml";
     private static final String MODEL_NAME = "SampleMineTreeModelWithTransformations";
     private static final String TARGET_FIELD = "decision";
-    private static final String WEATHERDECISION = "weatherdecision";
     private static final String OUT_DER_TEMPERATURE = "out_der_temperature";
     private static final String OUT_DER_FUN_HUMIDITY_APPLY = "out_der_fun_humidity_apply";
     private static final String OUT_DER_CONSTANT = "out_der_constant";
     private static final String CONSTANT = "constant";
-
+    private static final String WEATHERDECISION = "weatherdecision";
+    private static final String OUT_NORMDISCRETE_FIELD = "out_normdiscrete_field";
+    private static final String OUT_DISCRETIZE_FIELD = "out_discretize_field";
 
     private static PMMLRuntime pmmlRuntime;
 
@@ -78,16 +78,25 @@ public class SampleMineTreeModelWithTransformationsTest extends AbstractPMMLTest
         inputData.put("temperature", temperature);
         inputData.put("humidity", humidity);
         PMML4Result pmml4Result = evaluate(pmmlRuntime, inputData, MODEL_NAME);
-
         Assertions.assertThat(pmml4Result.getResultVariables().get(TARGET_FIELD)).isNotNull();
         Assertions.assertThat(pmml4Result.getResultVariables().get(TARGET_FIELD)).isEqualTo(expectedResult);
-        Assertions.assertThat(pmml4Result.getResultVariables().get(WEATHERDECISION)).isNotNull();
-        Assertions.assertThat(pmml4Result.getResultVariables().get(WEATHERDECISION)).isEqualTo(expectedResult);
-        Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_DER_TEMPERATURE)).isNotNull();
         Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_DER_TEMPERATURE)).isEqualTo(temperature);
-        Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_DER_FUN_HUMIDITY_APPLY)).isNotNull();
         Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_DER_FUN_HUMIDITY_APPLY)).isEqualTo(humidity);
-        Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_DER_CONSTANT)).isNotNull();
         Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_DER_CONSTANT)).isEqualTo(CONSTANT);
+        Assertions.assertThat(pmml4Result.getResultVariables().get(WEATHERDECISION)).isEqualTo(expectedResult);
+        Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_NORMDISCRETE_FIELD)).isNotNull();
+        if (expectedResult.equals("umbrella")) {
+            Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_NORMDISCRETE_FIELD)).isEqualTo(1.0);
+        } else {
+            Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_NORMDISCRETE_FIELD)).isEqualTo(0.0);
+        }
+        Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_DISCRETIZE_FIELD)).isNotNull();
+        if (temperature > 4.2 && temperature < 9.8) {
+            Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_DISCRETIZE_FIELD)).isEqualTo("abc");
+        } else if (temperature >= 15.4 && temperature < 32.1) {
+            Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_DISCRETIZE_FIELD)).isEqualTo("def");
+        } else {
+            Assertions.assertThat(pmml4Result.getResultVariables().get(OUT_DISCRETIZE_FIELD)).isEqualTo("defaultValue");
+        }
     }
 }

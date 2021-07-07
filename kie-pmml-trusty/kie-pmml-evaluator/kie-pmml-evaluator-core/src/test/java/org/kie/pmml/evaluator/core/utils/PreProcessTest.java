@@ -16,6 +16,7 @@
 
 package org.kie.pmml.evaluator.core.utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import org.kie.pmml.api.enums.DATA_TYPE;
 import org.kie.pmml.api.enums.MINING_FUNCTION;
 import org.kie.pmml.api.enums.OP_TYPE;
 import org.kie.pmml.api.runtime.PMMLContext;
+import org.kie.pmml.commons.model.ProcessingDTO;
 import org.kie.pmml.commons.model.expressions.KiePMMLApply;
 import org.kie.pmml.commons.model.expressions.KiePMMLConstant;
 import org.kie.pmml.commons.model.expressions.KiePMMLFieldRef;
@@ -140,7 +142,8 @@ public class PreProcessTest {
         assertTrue(retrieved.isPresent());
         assertEquals(value1, retrieved.get().getValue());
 
-        PreProcess.executeTransformations(kiePMMLModel, pmmlRequestData, kiePMMLNameValues);
+        ProcessingDTO processingDTO = new ProcessingDTO(kiePMMLModel, kiePMMLNameValues, new ArrayList<>());
+        PreProcess.executeTransformations(processingDTO, pmmlRequestData);
         mappedRequestParams = pmmlRequestData.getMappedRequestParams();
 
         Object expected = value1 / value2;
