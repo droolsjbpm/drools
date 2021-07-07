@@ -22,7 +22,6 @@ import org.kie.dmn.feel.runtime.functions.BaseFEELFunction;
 import org.kie.dmn.feel.runtime.functions.FEELFnResult;
 import org.kie.dmn.feel.runtime.functions.ParameterName;
 import org.kie.dmn.feel.util.EvalHelper;
-import org.kie.dmn.model.api.GwtIncompatible;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -31,7 +30,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-@GwtIncompatible
 public class NNMedianFunction
         extends BaseFEELFunction {
 

@@ -32,6 +32,7 @@ import java.util.TimeZone;
 
 import org.kie.dmn.api.feel.runtime.events.FEELEvent.Severity;
 import org.kie.dmn.feel.runtime.events.InvalidParametersEvent;
+import org.kie.dmn.feel.util.RegexpUtil;
 
 public class DateAndTimeFunction
         extends BaseFEELFunction {
@@ -42,12 +43,12 @@ public class DateAndTimeFunction
     public static final DateTimeFormatter REGION_DATETIME_FORMATTER;
     static {
         FEEL_DATE_TIME = new DateTimeFormatterBuilder().parseCaseInsensitive()
-                                                       .append(DateFunction.FEEL_DATE)
+                                                       .append(RegexpUtil.FEEL_DATE)
                                                        .appendLiteral('T')
                                                        .append(TimeFunction.FEEL_TIME)
                                                        .toFormatter();
         REGION_DATETIME_FORMATTER = new DateTimeFormatterBuilder().parseCaseInsensitive()
-                                                                 .append(DateFunction.FEEL_DATE)
+                                                                 .append(RegexpUtil.FEEL_DATE)
                                                                  .appendLiteral('T')
                                                                  .append(DateTimeFormatter.ISO_LOCAL_TIME)
                                                                  .appendLiteral("@")
@@ -63,7 +64,7 @@ public class DateAndTimeFunction
         if ( val == null ) {
             return FEELFnResult.ofError(new InvalidParametersEvent(Severity.ERROR, "from", "cannot be null"));
         }
-        if (!DateFunction.BEGIN_YEAR.matcher(val).find()) { // please notice the regex strictly requires the beginning, so we can use find.
+        if (!RegexpUtil.findFindYear(val)) { // please notice the regex strictly requires the beginning, so we can use find.
             return FEELFnResult.ofError(new InvalidParametersEvent(Severity.ERROR, "from", "year not compliant with XML Schema Part 2 Datatypes"));
         }
 

@@ -18,14 +18,12 @@ package org.kie.dmn.api.core;
 
 import org.kie.api.builder.Message;
 import org.kie.dmn.api.feel.runtime.events.FEELEvent;
-import org.kie.dmn.model.api.GwtIncompatible;
 import org.kie.internal.builder.InternalMessage;
 
 /**
  * A general message interface for all DMN related messages
  * raised during compilation and execution.
  */
-@GwtIncompatible
 public interface DMNMessage extends InternalMessage {
 
     enum Severity {

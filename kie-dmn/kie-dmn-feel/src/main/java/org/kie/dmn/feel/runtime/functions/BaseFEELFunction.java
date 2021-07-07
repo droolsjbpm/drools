@@ -39,9 +39,9 @@ import org.kie.dmn.feel.lang.types.FunctionSymbol;
 import org.kie.dmn.feel.runtime.FEELFunction;
 import org.kie.dmn.feel.runtime.events.FEELEventBase;
 import org.kie.dmn.feel.runtime.events.InvalidParametersEvent;
+import org.kie.dmn.feel.util.ClassUtil;
 import org.kie.dmn.feel.util.Either;
 import org.kie.dmn.feel.util.EvalHelper;
-import org.kie.dmn.model.api.GwtIncompatible;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +74,6 @@ public abstract class BaseFEELFunction
     }
 
     @Override
-    @GwtIncompatible
     public Object invokeReflectively(EvaluationContext ctx, Object[] params) {
         // use reflection to call the appropriate invoke method
         try {
@@ -187,22 +186,21 @@ public abstract class BaseFEELFunction
         return params;
     }
 
-    @GwtIncompatible
     private CandidateMethod getCandidateMethod(EvaluationContext ctx, Object[] params, boolean isNamedParams, List<String> available) {
         CandidateMethod candidate = null;
         // first, look for exact matches
-        for ( Method m : getClass().getDeclaredMethods() ) {
+        for ( Method m : ClassUtil.getDeclaredMethods(getClass()) ) {
             if ( !Modifier.isPublic(m.getModifiers()) || !m.getName().equals( "invoke" ) ) {
                 continue;
             }
 
             Object[] actualParams = null;
-            boolean injectCtx = Arrays.stream( m.getParameterTypes() ).anyMatch( p -> EvaluationContext.class.isAssignableFrom( p ) );
+            boolean injectCtx = Arrays.stream( m.getParameterTypes() ).anyMatch( p -> ClassUtil.isAssignableFrom( EvaluationContext.class, p ) );
             if( injectCtx ) {
                 actualParams = new Object[ params.length + 1 ];
                 int j = 0;
                 for (int i = 0; i < m.getParameterCount(); i++) {
-                    if( EvaluationContext.class.isAssignableFrom( m.getParameterTypes()[i] ) ) {
+                    if( ClassUtil.isAssignableFrom(EvaluationContext.class, m.getParameterTypes()[i] ) ) {
                         if( isNamedParams ) {
                             actualParams[i] = new NamedParameter( "ctx", ctx );
                         } else {
@@ -239,15 +237,15 @@ public abstract class BaseFEELFunction
             boolean found = true;
             for ( int i = 0; i < parameterTypes.length; i++ ) {
                 Class<?> currentIdxActualParameterType = cm.getActualClasses()[i];
-                if ( currentIdxActualParameterType != null && !parameterTypes[i].isAssignableFrom( currentIdxActualParameterType ) ) {
+                if ( currentIdxActualParameterType != null && !ClassUtil.isAssignableFrom(parameterTypes[i], currentIdxActualParameterType ) ) {
                     // singleton list spec defines that "a=[a]", i.e., singleton collections should be treated as the single element
                     // and vice-versa
-                    if ( Collection.class.isAssignableFrom( currentIdxActualParameterType ) ) {
+                    if ( ClassUtil.isAssignableFrom( Collection.class, currentIdxActualParameterType ) ) {
                         Collection<?> valueCollection = (Collection<?>) actualParams[i];                    
                         if ( valueCollection.size() == 1 ) {
                             Object singletonValue = valueCollection.iterator().next();
                             // re-perform the assignable-from check, this time using the element itself the singleton value from the original parameter list
-                            if ( singletonValue != null && parameterTypes[i].isAssignableFrom( singletonValue.getClass() ) ) {
+                            if ( singletonValue != null && ClassUtil.isAssignableFrom(parameterTypes[i], singletonValue.getClass() ) ) {
                                 Object[] newParams = new Object[cm.getActualParams().length];
                                 System.arraycopy( cm.getActualParams(), 0, newParams, 0, cm.getActualParams().length ); // can't rely on adjustForVariableParameters() have actually copied
                                 newParams[i] = singletonValue;
@@ -292,7 +290,6 @@ public abstract class BaseFEELFunction
     /**
      * Adjust CandidateMethod considering var args signature. 
      */
-    @GwtIncompatible
     private void adjustForVariableParameters(CandidateMethod cm, Class<?>[] parameterTypes) {
         if ( parameterTypes.length > 0 && parameterTypes[parameterTypes.length - 1].isArray() ) {
             // then it is a variable parameters function call
@@ -307,7 +304,6 @@ public abstract class BaseFEELFunction
         }
     }
 
-    @GwtIncompatible
     private Object[] calculateActualParams(EvaluationContext ctx, Method m, Object[] params, List<String> available) {
         Annotation[][] pas = m.getParameterAnnotations();
         List<String> names = new ArrayList<>( m.getParameterCount() );
@@ -369,7 +365,6 @@ public abstract class BaseFEELFunction
         return false;
     }
 
-    @GwtIncompatible
     private static class CandidateMethod {
         private Method   apply         = null;
         private Object[] actualParams  = null;

@@ -54,14 +54,12 @@ import org.kie.dmn.feel.runtime.functions.DurationFunction;
 import org.kie.dmn.feel.runtime.functions.FEELFnResult;
 import org.kie.dmn.feel.runtime.functions.TimeFunction;
 import org.kie.dmn.feel.util.EvalHelper;
-import org.kie.dmn.model.api.GwtIncompatible;
 
 import static org.kie.dmn.feel.runtime.functions.FEELConversionFunctionNames.DATE;
 import static org.kie.dmn.feel.runtime.functions.FEELConversionFunctionNames.DATE_AND_TIME;
 import static org.kie.dmn.feel.runtime.functions.FEELConversionFunctionNames.DURATION;
 import static org.kie.dmn.feel.runtime.functions.FEELConversionFunctionNames.TIME;
 
-@GwtIncompatible
 public class ASTTemporalConstantVisitor extends DefaultedVisitor<ASTNode> {
 
     private final ScopeHelper<FEELFunction> scopeHelper = new ScopeHelper<>();

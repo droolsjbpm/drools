@@ -33,9 +33,8 @@ import org.kie.dmn.feel.runtime.functions.interval.OverlapsBeforeFunction;
 import org.kie.dmn.feel.runtime.functions.interval.OverlapsFunction;
 import org.kie.dmn.feel.runtime.functions.interval.StartedByFunction;
 import org.kie.dmn.feel.runtime.functions.interval.StartsFunction;
-import org.kie.dmn.model.api.GwtIncompatible;
+import org.kie.dmn.feel.util.ClassUtil;
 
-@GwtIncompatible
 public class BuiltInFunctions {
 
     protected static final FEELFunction[] FUNCTIONS = new FEELFunction[]{
@@ -125,10 +124,9 @@ public class BuiltInFunctions {
         return FUNCTIONS;
     }
 
-    @GwtIncompatible
     public static <T extends FEELFunction> T getFunction(Class<T> functionClazz) {
         return (T) Stream.of(FUNCTIONS)
-                .filter(f -> functionClazz.isAssignableFrom(f.getClass()))
+                .filter(f -> ClassUtil.isAssignableFrom(functionClazz, f.getClass()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find function by class " + functionClazz.getCanonicalName() + "!"));
     }

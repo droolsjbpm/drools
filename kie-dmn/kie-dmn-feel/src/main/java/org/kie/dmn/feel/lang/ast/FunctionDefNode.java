@@ -32,10 +32,9 @@ import org.kie.dmn.feel.lang.types.BuiltInType;
 import org.kie.dmn.feel.runtime.FEELFunction.Param;
 import org.kie.dmn.feel.runtime.functions.CustomFEELFunction;
 import org.kie.dmn.feel.runtime.functions.JavaFunction;
+import org.kie.dmn.feel.util.ClassUtil;
 import org.kie.dmn.feel.util.Msg;
-import org.kie.dmn.model.api.GwtIncompatible;
 
-@GwtIncompatible
 public class FunctionDefNode
         extends BaseNode {
 
@@ -99,7 +98,7 @@ public class FunctionDefNode
                     String methodSignature = (String) java.get( "method signature" );
                     if( clazzName != null && methodSignature != null ) {
                         // might need to explicitly use a classloader here
-                        Class<?> clazz = Class.forName(clazzName, true, ctx.getRootClassLoader());
+                        Class<?> clazz = ClassUtil.forName(clazzName, true, ctx.getRootClassLoader());
                         if( clazz != null ) {
                             String[] mp = parseMethod( methodSignature );
                             if( mp != null ) {
@@ -111,7 +110,7 @@ public class FunctionDefNode
                                     for( int i = 0; i < numberOfParams; i++ ) {
                                         paramTypes[i] = getType(paramTypeNames[i], ctx.getRootClassLoader());
                                     }
-                                    Method method = clazz.getMethod( methodName, paramTypes );
+                                    Method method = ClassUtil.getMethod( clazz, methodName, paramTypes );
                                     return new JavaFunction(ANONYMOUS, params, clazz, method);
                                 } else {
                                     ctx.notifyEvt( astEvent(Severity.ERROR, Msg.createMessage(Msg.PARAMETER_COUNT_MISMATCH_ON_FUNCTION_DEFINITION, getText()) ) );
@@ -136,7 +135,7 @@ public class FunctionDefNode
         Class<?> type = convertPrimitiveNameToType( typeName );
         if( type == null ) {
             // if it is not, then try to load it
-            type = Class.forName(typeName, true, classLoader);
+            type = ClassUtil.forName(typeName, true, classLoader);
 
         }
         return type;

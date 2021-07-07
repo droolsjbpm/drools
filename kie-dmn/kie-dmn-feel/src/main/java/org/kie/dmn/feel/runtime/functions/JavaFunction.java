@@ -27,11 +27,10 @@ import org.kie.dmn.api.feel.runtime.events.FEELEvent.Severity;
 import org.kie.dmn.feel.lang.EvaluationContext;
 import org.kie.dmn.feel.runtime.events.FEELEventBase;
 import org.kie.dmn.feel.runtime.events.InvalidInputEvent;
-import org.kie.dmn.model.api.GwtIncompatible;
+import org.kie.dmn.feel.util.ClassUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@GwtIncompatible
 public class JavaFunction
         extends BaseFEELFunction {
 
@@ -91,7 +90,7 @@ public class JavaFunction
         Class[] paramTypes = method.getParameterTypes();
         params = adjustForVariableParameters( paramTypes, params );
         for( int i = 0; i < paramTypes.length; i++ ) {
-            if (params[i] != null && paramTypes[i].isAssignableFrom(params[i].getClass())) {
+            if (params[i] != null && ClassUtil.isAssignableFrom(paramTypes[i], params[i].getClass())) {
                 actual[i] = params[i];
             } else {
                 // try to coerce

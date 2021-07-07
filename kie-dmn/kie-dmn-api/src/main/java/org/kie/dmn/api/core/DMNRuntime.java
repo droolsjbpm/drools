@@ -19,7 +19,6 @@ package org.kie.dmn.api.core;
 import java.util.List;
 
 import org.kie.dmn.api.core.event.DMNRuntimeEventManager;
-import org.kie.dmn.model.api.GwtIncompatible;
 
 public interface DMNRuntime extends DMNRuntimeEventManager {
 
@@ -133,7 +132,6 @@ public interface DMNRuntime extends DMNRuntimeEventManager {
     /**
      * Returns the ClassLoader used by this DMNRuntime
      */
-    @GwtIncompatible
     ClassLoader getRootClassLoader();
 
     /**

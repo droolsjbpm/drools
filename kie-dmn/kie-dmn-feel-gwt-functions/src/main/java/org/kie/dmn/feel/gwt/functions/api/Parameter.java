@@ -21,16 +21,23 @@ import org.kie.dmn.feel.lang.types.BuiltInType;
 public class Parameter implements HumanReadable {
 
     private final String name;
+    private final Class parameterTypeClass;
     private final BuiltInType type;
 
     public Parameter(final String name,
+                     final Class parameterTypeClass,
                      final BuiltInType type) {
         this.name = name;
+        this.parameterTypeClass = parameterTypeClass;
         this.type = type;
     }
 
     public String getName() {
         return name;
+    }
+
+    public Class getParameterTypeClass() {
+        return parameterTypeClass;
     }
 
     public BuiltInType getType() {

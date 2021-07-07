@@ -19,6 +19,7 @@ package org.kie.dmn.feel.gwt.functions.rebind;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.dmn.feel.FEEL;
 import org.kie.dmn.feel.lang.FEELProfile;
@@ -31,6 +32,7 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@Ignore
 public class MethodTemplatesTest {
 
     private static final List<FEELProfile> profiles = new ArrayList<>();

@@ -20,9 +20,8 @@ import java.util.stream.IntStream;
 
 import org.kie.dmn.api.feel.runtime.events.FEELEvent.Severity;
 import org.kie.dmn.feel.runtime.events.InvalidParametersEvent;
-import org.kie.dmn.model.api.GwtIncompatible;
+import org.kie.dmn.feel.util.StringUtil;
 
-@GwtIncompatible
 public class SubstringFunction
         extends BaseFEELFunction {
 
@@ -53,7 +52,7 @@ public class SubstringFunction
         }
 
         int skip = start.intValue() > 0 ? start.intValue() - 1 : stringLength + start.intValue();
-        IntStream stream = string.codePoints().skip(skip);
+        IntStream stream = StringUtil.codePoints(string).skip(skip);
         if (length != null) {
             stream = stream.limit(length.longValue());
         }

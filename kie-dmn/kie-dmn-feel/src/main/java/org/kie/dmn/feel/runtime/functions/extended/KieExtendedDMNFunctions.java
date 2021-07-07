@@ -29,6 +29,7 @@ import org.kie.dmn.feel.runtime.functions.twovaluelogic.NNMinFunction;
 import org.kie.dmn.feel.runtime.functions.twovaluelogic.NNModeFunction;
 import org.kie.dmn.feel.runtime.functions.twovaluelogic.NNStddevFunction;
 import org.kie.dmn.feel.runtime.functions.twovaluelogic.NNSumFunction;
+import org.kie.dmn.feel.util.ClassUtil;
 import org.kie.dmn.model.api.GwtIncompatible;
 
 /**
@@ -65,10 +66,9 @@ public class KieExtendedDMNFunctions {
         return FUNCTIONS;
     }
 
-    @GwtIncompatible
     public static <T extends FEELFunction> T getFunction(Class<T> functionClazz) {
         return (T) Stream.of(FUNCTIONS)
-                .filter(f -> functionClazz.isAssignableFrom(f.getClass()))
+                .filter(f -> ClassUtil.isAssignableFrom(functionClazz, f.getClass()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find function by class " + functionClazz.getCanonicalName() + "!"));
     }

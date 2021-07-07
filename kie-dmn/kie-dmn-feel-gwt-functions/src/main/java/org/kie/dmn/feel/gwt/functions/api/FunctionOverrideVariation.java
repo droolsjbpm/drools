@@ -28,19 +28,26 @@ import org.kie.dmn.feel.lang.Type;
 public class FunctionOverrideVariation implements HumanReadable {
 
     private final Type returnType;
+    private String functionReturnTypeFQCNName;
     private String functionName;
     private final Set<Parameter> parameters;
 
     public FunctionOverrideVariation(final Type returnType,
+                                     final String functionReturnTypeFQCNName,
                                      final String functionName,
                                      final Parameter... parameters) {
         this.returnType = returnType;
+        this.functionReturnTypeFQCNName = functionReturnTypeFQCNName;
         this.functionName = functionName;
         this.parameters = new HashSet<>(Arrays.asList(parameters));
     }
 
     public Type getReturnType() {
         return returnType;
+    }
+
+    public String getFunctionReturnTypeFQCNName() {
+        return functionReturnTypeFQCNName;
     }
 
     public String getFunctionName() {

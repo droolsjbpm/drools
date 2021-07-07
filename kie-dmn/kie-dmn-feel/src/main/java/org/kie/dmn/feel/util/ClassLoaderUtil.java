@@ -18,9 +18,9 @@ package org.kie.dmn.feel.util;
 
 import org.kie.dmn.model.api.GwtIncompatible;
 
-@GwtIncompatible
 public class ClassLoaderUtil {
 
+    @GwtIncompatible
     public static final boolean CAN_PLATFORM_CLASSLOAD = System.getProperty("org.graalvm.nativeimage.imagecode") == null;
 
     public static ClassLoader findDefaultClassLoader() {

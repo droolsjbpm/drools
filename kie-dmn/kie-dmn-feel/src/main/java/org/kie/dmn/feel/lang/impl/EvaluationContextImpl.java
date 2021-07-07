@@ -29,9 +29,7 @@ import org.kie.dmn.api.feel.runtime.events.FEELEvent;
 import org.kie.dmn.api.feel.runtime.events.FEELEventListener;
 import org.kie.dmn.feel.lang.EvaluationContext;
 import org.kie.dmn.feel.util.EvalHelper;
-import org.kie.dmn.model.api.GwtIncompatible;
 
-@GwtIncompatible
 public class EvaluationContextImpl implements EvaluationContext {
 
     private final FEELEventListenersManager eventsManager;
@@ -73,7 +71,7 @@ public class EvaluationContextImpl implements EvaluationContext {
     @Override
     public EvaluationContext current() {
         EvaluationContextImpl ec = new EvaluationContextImpl(eventsManager);
-        ec.stack = stack.clone();
+        ec.stack = (ArrayDeque<ExecutionFrame>) stack.clone();
         ec.rootClassLoader = this.rootClassLoader;
         ec.dmnRuntime = this.dmnRuntime;
         ec.performRuntimeTypeCheck = this.performRuntimeTypeCheck;

@@ -23,9 +23,7 @@ import java.util.List;
 import org.kie.dmn.api.feel.runtime.events.FEELEvent.Severity;
 import org.kie.dmn.feel.lang.types.impl.InterceptNotComparableComparator;
 import org.kie.dmn.feel.runtime.events.InvalidParametersEvent;
-import org.kie.dmn.model.api.GwtIncompatible;
 
-@GwtIncompatible
 public class MaxFunction
         extends BaseFEELFunction {
 

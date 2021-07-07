@@ -13,9 +13,7 @@ import org.kie.dmn.feel.runtime.functions.BaseFEELFunction;
 import org.kie.dmn.feel.runtime.functions.FEELConversionFunctionNames;
 import org.kie.dmn.feel.runtime.functions.FEELFnResult;
 import org.kie.dmn.feel.runtime.functions.ParameterName;
-import org.kie.dmn.model.api.GwtIncompatible;
 
-@GwtIncompatible
 public class DurationFunction extends BaseFEELFunction {
     public static final DurationFunction INSTANCE = new DurationFunction();
 

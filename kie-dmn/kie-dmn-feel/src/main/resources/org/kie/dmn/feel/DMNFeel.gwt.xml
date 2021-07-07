@@ -28,4 +28,5 @@
   <source path="" includes="FEEL.java"/>
 
   <inherits name="org.kie.dmn.api.DMNApi"/>
+
 </module>

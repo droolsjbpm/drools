@@ -45,8 +45,18 @@
     </dependency>
 
     <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-dmn-feel-gwt-functions</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.dominokit</groupId>
       <artifactId>domino-slf4j-logger</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.treblereel.gwt</groupId>
+      <artifactId>gwt-bigmath</artifactId>
     </dependency>
 
     <dependency>

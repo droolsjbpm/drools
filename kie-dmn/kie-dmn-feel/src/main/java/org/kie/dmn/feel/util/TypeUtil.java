@@ -58,7 +58,7 @@ public final class TypeUtil {
         for (final Object object : collection) {
             if (object == null) {
                 continue;
-            } else if (!expectedType.isAssignableFrom(object.getClass())) {
+            } else if (!ClassUtil.isAssignableFrom(expectedType, object.getClass())) {
                 return false;
             }
         }
@@ -123,9 +123,9 @@ public final class TypeUtil {
 
     public static String formatDate(final LocalDate date, final boolean wrapForCodeUsage) {
         if (wrapForCodeUsage) {
-            return "date( \"" + DateFunction.FEEL_DATE.format(date) + "\" )";
+            return "date( \"" + RegexpUtil.FEEL_DATE.format(date) + "\" )";
         } else {
-            return DateFunction.FEEL_DATE.format(date);
+            return RegexpUtil.FEEL_DATE.format(date);
         }
     }
 
