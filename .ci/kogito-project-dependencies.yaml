@@ -1,4 +1,4 @@
-version: "2.0"
+version: "2.1"
 
 extends: https://raw.githubusercontent.com/kiegroup/droolsjbpm-build-bootstrap/master/.ci/project-dependencies.yaml
 
