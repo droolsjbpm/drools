@@ -38,6 +38,7 @@ import org.drools.core.reteoo.RuleTerminalNode;
 import org.drools.core.spi.ObjectType;
 import org.drools.core.util.bitmask.AllSetBitMask;
 import org.drools.core.util.bitmask.EmptyBitMask;
+import org.drools.mvel.compiler.Address;
 import org.drools.mvel.compiler.Cheese;
 import org.drools.mvel.compiler.Person;
 import org.drools.testcoverage.common.util.KieBaseTestConfiguration;
@@ -2733,5 +2734,129 @@ public class PropertySpecificTest {
 
         int cnt = kSession.fireAllRules();
         assertThat(cnt, is(NUM-1));
+    }
+
+    @Test
+    public void testEmptyModifyBlock() {
+        testMvelPropInModifyBlock(""); // this already works fine
+    }
+
+    @Test
+    public void testMvelGetterInModifyBlockWithoutParentheses() {
+        testMvelPropInModifyBlock("getAddresses"); // make sure it does no harm
+    }
+
+    @Test
+    public void testMvelGetterInModifyBlockWithParentheses() {
+        testMvelPropInModifyBlock("getAddresses()"); // make sure it does no harm
+    }
+
+    @Test
+    public void testMvelPropAssignmentInModifyBlock() {
+        testMvelPropInModifyBlock("addresses == $p.addresses"); // make sure it does no harm
+    }
+
+    private void testMvelPropInModifyBlock(String prop) {
+        final String str =
+                "import " + Person.class.getCanonicalName() + ";\n" +
+                           "import " + Address.class.getCanonicalName() + ";\n" +
+                           "dialect\"mvel\"\n" +
+                           "global java.util.List result;\n" +
+                           "rule R1\n" +
+                           "when\n" +
+                           "    $p : Person( addresses.size() < 5 )\n" +
+                           "then\n" +
+                           "    result.add($p.addresses.size());\n" +
+                           "end\n" +
+                           "rule R2\n" +
+                           "when\n" +
+                           "    $p : Person( name == \"Mario\" )\n" +
+                           "then\n" +
+                           "    $p.addresses.add(new Address(\"ABC\"));\n" +
+                           "    modify($p) { " + prop + " };\n" +
+                           "end\n";
+
+        KieBase kbase = KieBaseUtil.getKieBaseFromKieModuleFromDrl("test", kieBaseTestConfiguration, str);
+        KieSession ksession = kbase.newKieSession();
+        List<Integer> result = new ArrayList<>();
+        ksession.setGlobal("result", result);
+
+        Person p = new Person("Mario");
+        ksession.insert(p);
+        ksession.fireAllRules(10);
+
+        Assertions.assertThat(result).containsExactly(0, 1);
+    }
+
+    @Test
+    public void testMvelGetterAndPutInModifyBlockWithParentheses() {
+        final String str =
+                "import " + Person.class.getCanonicalName() + ";\n" +
+                           "import " + Address.class.getCanonicalName() + ";\n" +
+                           "dialect\"mvel\"\n" +
+                           "global java.util.List result;\n" +
+                           "rule R1\n" +
+                           "when\n" +
+                           "    $p : Person( namedAddresses.size() < 5 )\n" +
+                           "then\n" +
+                           "    result.add($p.namedAddresses.size());\n" +
+                           "end\n" +
+                           "rule R2\n" +
+                           "when\n" +
+                           "    $p : Person( name == \"Mario\" )\n" +
+                           "then\n" +
+                           "    $p.addresses.add(new Address(\"ABC\"));\n" +
+                           "    modify($p) { getNamedAddresses().put(\"DEF\", new Address(\"DEF\")) };\n" +
+                           "end\n";
+
+        KieBase kbase = KieBaseUtil.getKieBaseFromKieModuleFromDrl("test", kieBaseTestConfiguration, str);
+        KieSession ksession = kbase.newKieSession();
+        List<Integer> result = new ArrayList<>();
+        ksession.setGlobal("result", result);
+
+        Person p = new Person("Mario");
+        ksession.insert(p);
+        ksession.fireAllRules(10);
+
+        Assertions.assertThat(result).containsExactly(0, 1);
+    }
+
+    @Test
+    public void testMvelPropertyWithNoModification() {
+        final String str =
+                "import " + Person.class.getCanonicalName() + ";\n" +
+                           "import " + Address.class.getCanonicalName() + ";\n" +
+                           "dialect\"mvel\"\n" +
+                           "global java.util.List result;\n" +
+                           "rule R1\n" +
+                           "when\n" +
+                           "    $p : Person( addresses.size() < 5 )\n" +
+                           "then\n" +
+                           "    result.add($p.addresses.size());\n" +
+                           "end\n" +
+                           "rule R2\n" +
+                           "when\n" +
+                           "    $p : Person( age < 100 )\n" +
+                           "then\n" +
+                           "    result.add($p.age);\n" +
+                           "end\n" +
+                           "rule R3\n" +
+                           "when\n" +
+                           "    $p : Person( name == \"Mario\" )\n" +
+                           "then\n" +
+                           "    System.out.println($p.addresses);\n" + // addresses don't react
+                           "    modify($p) { age += 1 };\n" + // age react
+                           "end\n";
+
+        KieBase kbase = KieBaseUtil.getKieBaseFromKieModuleFromDrl("test", kieBaseTestConfiguration, str);
+        KieSession ksession = kbase.newKieSession();
+        List<Integer> result = new ArrayList<>();
+        ksession.setGlobal("result", result);
+
+        Person p = new Person("Mario", 40);
+        ksession.insert(p);
+        ksession.fireAllRules(10);
+
+        Assertions.assertThat(result).containsExactly(0, 40, 41);
     }
 }

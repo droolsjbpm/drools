@@ -273,17 +273,24 @@ public class MVELConsequenceBuilder
             for (String expr : splitStatements(text)) {
                 if (expr.startsWith( identifier + "." )) {
                     int fieldEnd = identifier.length()+1;
-                    while (Character.isJavaIdentifierPart( expr.charAt( fieldEnd ) )) fieldEnd++;
+                    while (fieldEnd < expr.length() && Character.isJavaIdentifierPart( expr.charAt( fieldEnd ) )) fieldEnd++;
                     String propertyName = expr.substring( identifier.length()+1, fieldEnd );
+                    boolean ignoreThisProp = false;
                     if (propertyName.length() > 3) {
                         if (propertyName.startsWith("set")) {
                             propertyName = Character.toLowerCase(propertyName.charAt(3)) + propertyName.substring(4);
                         } else if (propertyName.startsWith("get")) {
-                            int endMethodName = expr.indexOf('(');
-                            int endMethodArgs = findEndOfMethodArgsIndex(expr, endMethodName);
-                            String methodParams = expr.substring(endMethodName+1, endMethodArgs).trim();
-                            if (expr.length() > endMethodArgs+1 && expr.substring(endMethodArgs+1).trim().startsWith(".")) {
-                                propertyName = Character.toLowerCase(propertyName.charAt(3)) + propertyName.substring(4);
+                            int parenthesisIndex = expr.indexOf('(');
+                            int endMethodIndex;
+                            if (parenthesisIndex != -1) {
+                                endMethodIndex = findEndOfMethodArgsIndex(expr, parenthesisIndex);
+                            } else {
+                                endMethodIndex = fieldEnd;
+                            }
+                            if (expr.length() > endMethodIndex + 1 && expr.substring(endMethodIndex + 1).trim().startsWith(".")) {
+                                propertyName = Character.toLowerCase(propertyName.charAt(3)) + propertyName.substring(4); // assume the property is modified
+                            } else {
+                                ignoreThisProp = true; // just a getter
                             }
                         }
                     }
@@ -291,7 +298,7 @@ public class MVELConsequenceBuilder
                     int index = settableProperties.indexOf(propertyName);
                     if (index >= 0) {
                         modificationMask = setPropertyOnMask(modificationMask, index);
-                    } else {
+                    } else if (!ignoreThisProp) {
                         // I'm property reactive, but I was unable to infer which properties was modified, setting all bit in bitmask
                         modificationMask = allSetButTraitBitMask();
                         break;
