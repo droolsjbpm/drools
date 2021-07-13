@@ -57,7 +57,7 @@ public abstract class AbstractExpressionEvaluator implements ExpressionEvaluator
      * @return
      */
     protected boolean isStructuredResult(Class<?> resultClass) {
-        return resultClass != null && ScenarioSimulationSharedUtils.isCollection(resultClass.getCanonicalName());
+        return resultClass != null && ScenarioSimulationSharedUtils.isCollectionOrMap(resultClass.getCanonicalName());
     }
 
     /**
@@ -66,7 +66,7 @@ public abstract class AbstractExpressionEvaluator implements ExpressionEvaluator
      * @return
      */
     protected boolean isStructuredInput(String className) {
-        return ScenarioSimulationSharedUtils.isCollection(className);
+        return ScenarioSimulationSharedUtils.isCollectionOrMap(className);
     }
 
     protected Object convertResult(String rawString, String className, List<String> genericClasses) {

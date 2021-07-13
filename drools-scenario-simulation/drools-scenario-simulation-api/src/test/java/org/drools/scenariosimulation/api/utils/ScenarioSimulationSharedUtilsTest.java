@@ -17,11 +17,13 @@ package org.drools.scenariosimulation.api.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.junit.Test;
 
@@ -36,17 +38,28 @@ public class ScenarioSimulationSharedUtilsTest {
 
     List<String> mapValues = Arrays.asList(Map.class.getCanonicalName(),
                                            HashMap.class.getCanonicalName(),
-                                           LinkedHashMap.class.getCanonicalName());
+                                           LinkedHashMap.class.getCanonicalName(),
+                                           TreeMap.class.getCanonicalName());
+
+    @Test
+    public void isCollectionOrMap() {
+        assertTrue(listValues.stream().allMatch(ScenarioSimulationSharedUtils::isCollectionOrMap));
+        assertTrue(mapValues.stream().allMatch(ScenarioSimulationSharedUtils::isCollectionOrMap));
+        assertTrue(ScenarioSimulationSharedUtils.isCollectionOrMap(Collection.class.getCanonicalName()));
+    }
 
     @Test
     public void isCollection() {
         assertTrue(listValues.stream().allMatch(ScenarioSimulationSharedUtils::isCollection));
-        assertTrue(mapValues.stream().allMatch(ScenarioSimulationSharedUtils::isCollection));
+        assertFalse(mapValues.stream().allMatch(ScenarioSimulationSharedUtils::isCollection));
+        assertTrue(ScenarioSimulationSharedUtils.isCollectionOrMap(Collection.class.getCanonicalName()));
     }
 
     @Test
     public void isList() {
         assertTrue(listValues.stream().allMatch(ScenarioSimulationSharedUtils::isList));
+        assertFalse(mapValues.stream().allMatch(ScenarioSimulationSharedUtils::isList));
+        assertFalse(ScenarioSimulationSharedUtils.isList(Collection.class.getCanonicalName()));
     }
 
     @Test

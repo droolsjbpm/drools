@@ -53,7 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.util.stream.Collectors.toList;
-import static org.drools.scenariosimulation.api.utils.ScenarioSimulationSharedUtils.isCollection;
+import static org.drools.scenariosimulation.api.utils.ScenarioSimulationSharedUtils.isCollectionOrMap;
 import static org.drools.scenariosimulation.backend.runner.model.ValueWrapper.errorWithValidValue;
 import static org.drools.scenariosimulation.backend.runner.model.ValueWrapper.errorWithMessage;
 import static org.drools.scenariosimulation.backend.runner.model.ValueWrapper.errorWithCollectionPathToValue;
@@ -339,7 +339,7 @@ public abstract class AbstractRunnerHelper {
                                                                                                      resultClass);
             if (evaluationResult.isSuccessful()) {
                 return of(resultRaw);
-            } else if (isCollection(className)) {
+            } else if (isCollectionOrMap(className)) {
                 return errorWithCollectionPathToValue(evaluationResult.getWrongValue(), evaluationResult.getPathToWrongValue());
             } else {
                 return errorWithValidValue(resultRaw, expectedResultRaw);
