@@ -71,8 +71,8 @@ public class KiePMMLTreeModelFactory {
                                                                        model, fieldTypeMap, packageName);
         String fullClassName = packageName + "." + className;
         try {
-            Class<?> kiePMMLScorecardModelClass = hasClassLoader.compileAndLoadClass(sourcesMap, fullClassName);
-            return (KiePMMLTreeModel) kiePMMLScorecardModelClass.newInstance();
+            Class<?> kiePMMLTreeModelClass = hasClassLoader.compileAndLoadClass(sourcesMap, fullClassName);
+            return (KiePMMLTreeModel) kiePMMLTreeModelClass.newInstance();
         } catch (Exception e) {
             throw new KiePMMLException(e);
         }

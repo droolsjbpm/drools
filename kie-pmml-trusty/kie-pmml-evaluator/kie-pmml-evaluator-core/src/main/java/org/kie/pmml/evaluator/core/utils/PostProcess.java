@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.kie.api.pmml.PMML4Result;
 import org.kie.pmml.api.enums.DATA_TYPE;
@@ -32,10 +31,8 @@ import org.kie.pmml.api.exceptions.KiePMMLException;
 import org.kie.pmml.api.models.MiningField;
 import org.kie.pmml.commons.model.KiePMMLModel;
 import org.kie.pmml.commons.model.KiePMMLOutputField;
-import org.kie.pmml.commons.model.expressions.KiePMMLExpression;
+import org.kie.pmml.commons.model.ProcessingDTO;
 import org.kie.pmml.commons.model.tuples.KiePMMLNameValue;
-import org.kie.pmml.commons.transformations.KiePMMLDefineFunction;
-import org.kie.pmml.commons.transformations.KiePMMLDerivedField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,27 +49,27 @@ public class PostProcess {
         // Avoid instantiation
     }
 
-    public static void postProcess(final PMML4Result toReturn, final KiePMMLModel model,
-                                   final List<KiePMMLNameValue> kiePMMLNameValues) {
-        executeTargets(toReturn, model);
+    public static void postProcess(final PMML4Result toReturn, final KiePMMLModel model, final ProcessingDTO processingDTO) {
+        executeTargets(toReturn, processingDTO);
         updateTargetValueType(model, toReturn);
-        populateOutputFields(model, toReturn, kiePMMLNameValues);
+        toReturn.getResultVariables().forEach((key, value) -> processingDTO.addKiePMMLNameValue(new KiePMMLNameValue(key, value)));
+        populateOutputFields(toReturn, processingDTO,  model);
     }
 
     /**
      * Execute <b>modifications</b> on target result.
      * @param toModify
-     * @param model
+     * @param processingDTO
      * @see <a href="http://dmg.org/pmml/v4-4-1/Targets.html>Targets</a>
      */
-    static void executeTargets(final PMML4Result toModify, final KiePMMLModel model) {
-        logger.debug("executeTargets {} {}", toModify, model);
+    static void executeTargets(final PMML4Result toModify, final ProcessingDTO processingDTO) {
+        logger.debug("executeTargets {} {}", toModify, processingDTO);
         if (!toModify.getResultCode().equals(OK.getName())) {
             return;
         }
         final String targetFieldName = toModify.getResultObjectName();
         final Map<String, Object> resultVariables = toModify.getResultVariables();
-        model.getKiePMMLTargets()
+        processingDTO.getKiePMMLTargets()
                 .stream()
                 .filter(kiePMMLTarget -> kiePMMLTarget.getField() != null && kiePMMLTarget.getField().equals(targetFieldName))
                 .findFirst()
@@ -105,29 +102,27 @@ public class PostProcess {
 
     /**
      * Populated the <code>PMML4Result</code> with <code>OutputField</code> results
-     * @param model
      * @param toUpdate
-     * @param kiePMMLNameValues
+     * @param processingDTO
      */
-    static void populateOutputFields(final KiePMMLModel model, final PMML4Result toUpdate,
-                                     final List<KiePMMLNameValue> kiePMMLNameValues) {
-        logger.debug("populateOutputFields {} {} {}", model, toUpdate, kiePMMLNameValues);
-        final Map<RESULT_FEATURE, List<KiePMMLOutputField>> outputFieldsByFeature = model.getKiePMMLOutputFields()
+    static void populateOutputFields(final PMML4Result toUpdate,
+                                     final ProcessingDTO processingDTO,
+                                     final KiePMMLModel model) {
+        logger.debug("populateOutputFields {} {}", toUpdate, processingDTO);
+        final Map<RESULT_FEATURE, List<KiePMMLOutputField>> outputFieldsByFeature = processingDTO.getOutputFields()
                 .stream()
                 .collect(Collectors.groupingBy(KiePMMLOutputField::getResultFeature));
         List<KiePMMLOutputField> predictedOutputFields = outputFieldsByFeature.get(RESULT_FEATURE.PREDICTED_VALUE);
         if (predictedOutputFields != null) {
             predictedOutputFields
                     .forEach(outputField -> populatePredictedOutputField(outputField, toUpdate,
-                                                                         model,
-                                                                         kiePMMLNameValues));
+                                                                         processingDTO));
         }
         List<KiePMMLOutputField> transformedOutputFields = outputFieldsByFeature.get(RESULT_FEATURE.TRANSFORMED_VALUE);
         if (transformedOutputFields != null) {
             transformedOutputFields
                     .forEach(outputField -> populateTransformedOutputField(outputField, toUpdate,
-                                                                           model,
-                                                                           kiePMMLNameValues));
+                                                                           processingDTO));
         }
         List<KiePMMLOutputField> reasonCodeOutputFields = outputFieldsByFeature.get(RESULT_FEATURE.REASON_CODE);
         if (reasonCodeOutputFields != null) {
@@ -140,88 +135,57 @@ public class PostProcess {
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1,
                                               LinkedHashMap::new));
             final List<String> orderedReasonCodes = new ArrayList<>(sortedByValue.keySet());
+            processingDTO.addOrderedReasonCodes(orderedReasonCodes);
             reasonCodeOutputFields
-                    .forEach(outputField -> populateReasonCodeOutputField(outputField, toUpdate, orderedReasonCodes));
+                    .forEach(outputField -> populateReasonCodeOutputField(outputField,
+                                                                          toUpdate,
+                                                                          processingDTO));
         }
     }
 
     static void populatePredictedOutputField(final KiePMMLOutputField outputField,
                                              final PMML4Result toUpdate,
-                                             final KiePMMLModel model,
-                                             final List<KiePMMLNameValue> kiePMMLNameValues) {
-        logger.debug("populatePredictedOutputField {} {} {} {}", outputField, toUpdate, model, kiePMMLNameValues);
+                                             final ProcessingDTO processingDTO) {
+        logger.debug("populatePredictedOutputField {} {} {}", outputField, toUpdate, processingDTO);
         if (!RESULT_FEATURE.PREDICTED_VALUE.equals(outputField.getResultFeature())) {
             throw new KiePMMLException("Unexpected " + outputField.getResultFeature());
         }
-        String targetFieldName = outputField.getTargetField().orElse(toUpdate.getResultObjectName());
-        Optional<Object> variableValue = Optional.empty();
-        if (targetFieldName != null) {
-            variableValue = Stream.of(getValueFromPMMLResultByVariableName(targetFieldName, toUpdate),
-                                      getValueFromKiePMMLNameValuesByVariableName(targetFieldName, kiePMMLNameValues))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .findFirst();
-        }
-        variableValue.ifPresent(objValue -> toUpdate.addResultVariable(outputField.getName(), objValue));
+        Optional<Object> variableValue =
+                Optional.ofNullable(outputField.evaluatePredictedValue(processingDTO));
+        variableValue.ifPresent(objValue -> {
+            String variableName = outputField.getName();
+            toUpdate.addResultVariable(variableName, objValue);
+            processingDTO.addKiePMMLNameValue(new KiePMMLNameValue(variableName, objValue));
+        });
     }
 
     static void populateTransformedOutputField(final KiePMMLOutputField outputField,
                                                final PMML4Result toUpdate,
-                                               final KiePMMLModel model,
-                                               final List<KiePMMLNameValue> kiePMMLNameValues) {
-        logger.debug("populateTransformedOutputField {} {} {} {}", outputField, toUpdate, model, kiePMMLNameValues);
+                                               final ProcessingDTO processingDTO) {
+        logger.debug("populateTransformedOutputField {} {} {}", outputField, toUpdate, processingDTO);
         if (!RESULT_FEATURE.TRANSFORMED_VALUE.equals(outputField.getResultFeature())) {
             throw new KiePMMLException("Unexpected " + outputField.getResultFeature());
         }
-        String variableName = outputField.getName();
-        List<KiePMMLDerivedField> derivedFields = new ArrayList<>();
-        List<KiePMMLDefineFunction> defineFunctions = new ArrayList<>();
-        if (model.getTransformationDictionary() != null) {
-            if (model.getTransformationDictionary().getDerivedFields() != null) {
-                derivedFields.addAll(model.getTransformationDictionary().getDerivedFields());
-            }
-            if (model.getTransformationDictionary().getDefineFunctions() != null) {
-                defineFunctions.addAll(model.getTransformationDictionary().getDefineFunctions());
-            }
-        }
-        if (model.getLocalTransformations() != null && model.getLocalTransformations().getDerivedFields() != null) {
-            derivedFields.addAll(model.getLocalTransformations().getDerivedFields());
-        }
-        Optional<Object> variableValue = Optional.ofNullable(outputField.evaluate(defineFunctions, derivedFields, model.getKiePMMLOutputFields(), kiePMMLNameValues));
-        variableValue.ifPresent(objValue -> toUpdate.addResultVariable(variableName, objValue));
+        Optional<Object> variableValue = Optional.ofNullable(outputField.evaluateTransformedValue(processingDTO));
+        variableValue.ifPresent(objValue -> {
+            String variableName = outputField.getName();
+            toUpdate.addResultVariable(variableName, objValue);
+            processingDTO.addKiePMMLNameValue(new KiePMMLNameValue(variableName, objValue));
+        });
     }
 
     static void populateReasonCodeOutputField(final KiePMMLOutputField outputField,
                                               final PMML4Result toUpdate,
-                                              final List<String> orderedReasonCodes) {
-        logger.debug("populateReasonCodeOutputField {} {} {}", outputField, toUpdate, orderedReasonCodes);
+                                              final ProcessingDTO processingDTO) {
+        logger.debug("populateReasonCodeOutputField {} {} {}", outputField, toUpdate, processingDTO);
         if (!RESULT_FEATURE.REASON_CODE.equals(outputField.getResultFeature())) {
             throw new KiePMMLException("Unexpected " + outputField.getResultFeature());
         }
-        if (outputField.getRank() != null) {
-            int index = outputField.getRank() - 1;
-            String resultCode = null;
-            String resultVariableName = outputField.getName();
-            if (index < orderedReasonCodes.size()) {
-                resultCode = orderedReasonCodes.get(index);
-            }
-            toUpdate.updateResultVariable(resultVariableName, resultCode);
-        }
-    }
-
-
-
-    static Optional<Object> getValueFromKiePMMLNameValuesByVariableName(final String variableName,
-                                                                        final List<KiePMMLNameValue> kiePMMLNameValues) {
-        return kiePMMLNameValues.stream()
-                .filter(kiePMMLNameValue -> kiePMMLNameValue.getName().equals(variableName))
-                .map(KiePMMLNameValue::getValue)
-                .findFirst();
-    }
-
-    static Optional<Object> getValueFromPMMLResultByVariableName(final String variableName,
-                                                                 final PMML4Result pmml4Result) {
-        return Optional.ofNullable(pmml4Result.getResultVariables().get(variableName));
+        Optional<Object> variableValue = Optional.ofNullable(outputField.evaluateReasonCodeValue(processingDTO));
+        variableValue.ifPresent(objValue -> {
+            toUpdate.addResultVariable(outputField.getName(), objValue);
+            processingDTO.addKiePMMLNameValue(new KiePMMLNameValue(outputField.getName(), objValue));
+        });
     }
 
 }

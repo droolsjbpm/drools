@@ -31,12 +31,12 @@ import org.dmg.pmml.DataDictionary;
 import org.dmg.pmml.DataField;
 import org.dmg.pmml.MiningFunction;
 import org.dmg.pmml.OpType;
+import org.dmg.pmml.OutputField;
 import org.dmg.pmml.TransformationDictionary;
 import org.dmg.pmml.regression.RegressionModel;
 import org.kie.pmml.api.exceptions.KiePMMLException;
 import org.kie.pmml.api.exceptions.KiePMMLInternalException;
 import org.kie.pmml.commons.model.HasClassLoader;
-import org.kie.pmml.commons.model.KiePMMLOutputField;
 import org.kie.pmml.compiler.commons.builders.KiePMMLModelCodegenUtils;
 import org.kie.pmml.compiler.commons.utils.CommonCodegenUtils;
 import org.kie.pmml.compiler.commons.utils.JavaParserUtils;
@@ -47,7 +47,6 @@ import org.slf4j.LoggerFactory;
 
 import static org.kie.pmml.commons.Constants.MISSING_DEFAULT_CONSTRUCTOR;
 import static org.kie.pmml.commons.utils.KiePMMLModelUtils.getSanitizedClassName;
-import static org.kie.pmml.compiler.commons.factories.KiePMMLOutputFieldFactory.getOutputFields;
 import static org.kie.pmml.compiler.commons.utils.JavaParserUtils.MAIN_CLASS_NOT_FOUND;
 import static org.kie.pmml.compiler.commons.utils.JavaParserUtils.getFullClassName;
 import static org.kie.pmml.compiler.commons.utils.ModelUtils.getTargetFieldName;
@@ -91,7 +90,7 @@ public class KiePMMLRegressionModelFactory {
         ClassOrInterfaceDeclaration modelTemplate = cloneCU.getClassByName(className)
                 .orElseThrow(() -> new KiePMMLException(MAIN_CLASS_NOT_FOUND + ": " + className));
         String targetFieldName = getTargetFieldName(dataDictionary, model).orElse(null);
-        List<KiePMMLOutputField> outputFields = getOutputFields(model);
+        List<OutputField> outputFields =  model.getOutput() != null ? model.getOutput().getOutputFields() : Collections.emptyList();
         Map<String, KiePMMLTableSourceCategory> tablesSourceMap = getRegressionTablesMap(dataDictionary, model,
                                                                                          targetFieldName,
                                                                                          outputFields, packageName);
@@ -119,7 +118,7 @@ public class KiePMMLRegressionModelFactory {
     static Map<String, KiePMMLTableSourceCategory> getRegressionTablesMap(final DataDictionary dataDictionary,
                                                                           final RegressionModel model,
                                                                           final String targetFieldName,
-                                                                          final List<KiePMMLOutputField> outputFields,
+                                                                          final List<OutputField> outputFields,
                                                                           final String packageName) {
         final DataField targetDataField = dataDictionary.getDataFields().stream()
                 .filter(field -> Objects.equals(targetFieldName, field.getName().getValue()))

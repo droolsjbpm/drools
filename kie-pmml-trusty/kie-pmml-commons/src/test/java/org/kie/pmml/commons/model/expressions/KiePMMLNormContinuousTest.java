@@ -22,6 +22,8 @@ import java.util.List;
 
 import org.junit.Test;
 import org.kie.pmml.api.enums.OUTLIER_TREATMENT_METHOD;
+import org.kie.pmml.commons.model.ProcessingDTO;
+import org.kie.pmml.commons.model.tuples.KiePMMLNameValue;
 
 import static org.junit.Assert.*;
 
@@ -40,6 +42,23 @@ public class KiePMMLNormContinuousTest {
         assertEquals(ln1, linearNorms.get(0));
         assertEquals(ln2, linearNorms.get(1));
         assertEquals(ln0, linearNorms.get(2));
+    }
+
+    @Test
+    public void evaluate() {
+        String fieldName = "fieldName";
+        Number input = 24;
+        KiePMMLNormContinuous kiePMMLNormContinuous = getKiePMMLNormContinuous(fieldName, null, null);
+        ProcessingDTO processingDTO = new ProcessingDTO(Collections.emptyList(),
+                                                        Collections.emptyList(),
+                                                        Collections.emptyList(),
+                                                        Collections.singletonList(new KiePMMLNameValue(fieldName, input)));
+        Number retrieved = (Number) kiePMMLNormContinuous.evaluate(processingDTO);
+        Number expected =
+                kiePMMLNormContinuous.linearNorms.get(0).getNorm() +
+                        ((input.doubleValue() - kiePMMLNormContinuous.linearNorms.get(0).getOrig()) / (kiePMMLNormContinuous.linearNorms.get(1).getOrig() - kiePMMLNormContinuous.linearNorms.get(0).getOrig()))
+                                * (kiePMMLNormContinuous.linearNorms.get(1).getNorm() - kiePMMLNormContinuous.linearNorms.get(0).getNorm());
+        assertEquals(expected, retrieved);
     }
 
     @Test
@@ -300,6 +319,6 @@ public class KiePMMLNormContinuousTest {
         KiePMMLLinearNorm ln2 = new KiePMMLLinearNorm("2", Collections.emptyList(), 36, 34);
         KiePMMLLinearNorm ln3 = new KiePMMLLinearNorm("3", Collections.emptyList(), 40, 39);
         List<KiePMMLLinearNorm> linearNorms = Arrays.asList(ln0, ln1, ln2, ln3);
-        return new KiePMMLNormContinuous(null, Collections.emptyList(), linearNorms, outlierTreatmentMethod, mapMissingTo);
+        return new KiePMMLNormContinuous(name, Collections.emptyList(), linearNorms, outlierTreatmentMethod, mapMissingTo);
     }
 }

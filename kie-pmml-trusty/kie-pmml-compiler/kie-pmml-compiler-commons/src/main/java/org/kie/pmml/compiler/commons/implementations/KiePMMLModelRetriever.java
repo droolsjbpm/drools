@@ -30,7 +30,6 @@ import org.kie.pmml.api.enums.PMML_MODEL;
 import org.kie.pmml.api.exceptions.KiePMMLException;
 import org.kie.pmml.commons.model.HasClassLoader;
 import org.kie.pmml.commons.model.KiePMMLModel;
-import org.kie.pmml.commons.model.KiePMMLOutputField;
 import org.kie.pmml.commons.model.KiePMMLTarget;
 import org.kie.pmml.compiler.api.provider.ModelImplementationProvider;
 import org.kie.pmml.compiler.api.provider.ModelImplementationProviderFinder;
@@ -77,7 +76,6 @@ public class KiePMMLModelRetriever {
                                                                       hasClassloader))
                 .map(kiePMMLModel -> getPopulatedWithPMMLModelFields(kiePMMLModel, dataDictionary,
                                                                      model.getMiningSchema(), model.getOutput()))
-                .map(kiePMMLModel -> getPopulatedWithKiePMMLOutputFields(kiePMMLModel, model.getOutput()))
                 .map(kiePMMLModel -> getPopulatedWithKiePMMLTargets(kiePMMLModel, model.getTargets()))
                 .findFirst();
     }
@@ -167,15 +165,6 @@ public class KiePMMLModelRetriever {
             final List<org.kie.pmml.api.models.OutputField> converted = ModelUtils.convertToKieOutputFieldList(output
                     , dataDictionary);
             toPopulate.setOutputFields(converted);
-        }
-        return toPopulate;
-    }
-
-    static KiePMMLModel getPopulatedWithKiePMMLOutputFields(final KiePMMLModel toPopulate,
-                                                            final Output output) {
-        if (output != null) {
-            final List<KiePMMLOutputField> converted = ModelUtils.convertToKiePMMLOutputFieldList(output);
-            toPopulate.setKiePMMLOutputFields(converted);
         }
         return toPopulate;
     }

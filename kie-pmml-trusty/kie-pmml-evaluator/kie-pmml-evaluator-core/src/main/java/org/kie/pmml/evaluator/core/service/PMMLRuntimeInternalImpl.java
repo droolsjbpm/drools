@@ -26,7 +26,7 @@ import org.kie.pmml.api.exceptions.KiePMMLException;
 import org.kie.pmml.api.models.PMMLModel;
 import org.kie.pmml.api.runtime.PMMLContext;
 import org.kie.pmml.commons.model.KiePMMLModel;
-import org.kie.pmml.commons.model.tuples.KiePMMLNameValue;
+import org.kie.pmml.commons.model.ProcessingDTO;
 import org.kie.pmml.evaluator.api.executor.PMMLRuntimeInternal;
 import org.kie.pmml.evaluator.core.executor.PMMLModelEvaluator;
 import org.kie.pmml.evaluator.core.executor.PMMLModelEvaluatorFinderImpl;
@@ -89,12 +89,12 @@ public class PMMLRuntimeInternalImpl implements PMMLRuntimeInternal {
         if (logger.isDebugEnabled()) {
             logger.debug("evaluate {} {}", model, context);
         }
-        final List<KiePMMLNameValue> kiePMMLNameValues = preProcess(model, context);
+        final ProcessingDTO processingDTO = preProcess(model, context);
         PMMLModelEvaluator executor = getFromPMMLModelType(model.getPmmlMODEL())
                 .orElseThrow(() -> new KiePMMLException(String.format("PMMLModelEvaluator not found for model %s",
                                                                       model.getPmmlMODEL())));
         PMML4Result toReturn = executor.evaluate(knowledgeBase, model, context);
-        postProcess(toReturn, model, kiePMMLNameValues);
+        postProcess(toReturn, model, processingDTO);
         return toReturn;
     }
 

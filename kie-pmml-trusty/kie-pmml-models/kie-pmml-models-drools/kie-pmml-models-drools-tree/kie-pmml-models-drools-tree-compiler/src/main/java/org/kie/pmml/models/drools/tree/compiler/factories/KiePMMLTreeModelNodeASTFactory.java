@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.dmg.pmml.False;
+import org.dmg.pmml.OutputField;
 import org.dmg.pmml.Predicate;
 import org.dmg.pmml.True;
 import org.dmg.pmml.tree.LeafNode;
 import org.dmg.pmml.tree.Node;
 import org.dmg.pmml.tree.TreeModel;
-import org.kie.pmml.commons.model.KiePMMLOutputField;
 import org.kie.pmml.api.enums.DATA_TYPE;
 import org.kie.pmml.models.drools.ast.KiePMMLDroolsRule;
 import org.kie.pmml.models.drools.ast.factories.KiePMMLPredicateASTFactory;
@@ -45,18 +45,18 @@ public class KiePMMLTreeModelNodeASTFactory {
     private static final Logger logger = LoggerFactory.getLogger(KiePMMLTreeModelNodeASTFactory.class.getName());
 
     private final Map<String, KiePMMLOriginalTypeGeneratedType> fieldTypeMap;
-    private final List<KiePMMLOutputField> outputFields;
+    private final List<OutputField> outputFields;
     private final TreeModel.NoTrueChildStrategy noTrueChildStrategy;
     private final DATA_TYPE targetType;
 
-    private KiePMMLTreeModelNodeASTFactory(final Map<String, KiePMMLOriginalTypeGeneratedType> fieldTypeMap, final List<KiePMMLOutputField> outputFields, final TreeModel.NoTrueChildStrategy noTrueChildStrategy, final DATA_TYPE targetType) {
+    private KiePMMLTreeModelNodeASTFactory(final Map<String, KiePMMLOriginalTypeGeneratedType> fieldTypeMap, final List<OutputField> outputFields, final TreeModel.NoTrueChildStrategy noTrueChildStrategy, final DATA_TYPE targetType) {
         this.fieldTypeMap = fieldTypeMap;
         this.outputFields = outputFields;
         this.noTrueChildStrategy = noTrueChildStrategy;
         this.targetType = targetType;
     }
 
-    public static KiePMMLTreeModelNodeASTFactory factory(final Map<String, KiePMMLOriginalTypeGeneratedType> fieldTypeMap, final List<KiePMMLOutputField> outputFields, final TreeModel.NoTrueChildStrategy noTrueChildStrategy, final DATA_TYPE targetType) {
+    public static KiePMMLTreeModelNodeASTFactory factory(final Map<String, KiePMMLOriginalTypeGeneratedType> fieldTypeMap, final List<OutputField> outputFields, final TreeModel.NoTrueChildStrategy noTrueChildStrategy, final DATA_TYPE targetType) {
         return new KiePMMLTreeModelNodeASTFactory(fieldTypeMap, outputFields, noTrueChildStrategy, targetType);
     }
 

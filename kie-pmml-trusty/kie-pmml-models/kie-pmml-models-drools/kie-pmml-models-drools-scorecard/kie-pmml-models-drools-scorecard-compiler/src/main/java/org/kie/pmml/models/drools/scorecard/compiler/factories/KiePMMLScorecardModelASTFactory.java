@@ -15,23 +15,23 @@
  */
 package org.kie.pmml.models.drools.scorecard.compiler.factories;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.dmg.pmml.DataDictionary;
+import org.dmg.pmml.OutputField;
 import org.dmg.pmml.scorecard.Scorecard;
-import org.kie.pmml.commons.model.KiePMMLOutputField;
 import org.kie.pmml.api.enums.DATA_TYPE;
+import org.kie.pmml.api.enums.REASONCODE_ALGORITHM;
 import org.kie.pmml.models.drools.ast.KiePMMLDroolsAST;
 import org.kie.pmml.models.drools.ast.KiePMMLDroolsRule;
 import org.kie.pmml.models.drools.ast.KiePMMLDroolsType;
 import org.kie.pmml.models.drools.ast.factories.KiePMMLAbstractModelASTFactory;
-import org.kie.pmml.api.enums.REASONCODE_ALGORITHM;
 import org.kie.pmml.models.drools.tuples.KiePMMLOriginalTypeGeneratedType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.kie.pmml.compiler.commons.factories.KiePMMLOutputFieldFactory.getOutputFields;
 import static org.kie.pmml.compiler.commons.utils.ModelUtils.getTargetFieldType;
 
 /**
@@ -63,7 +63,7 @@ public class KiePMMLScorecardModelASTFactory extends KiePMMLAbstractModelASTFact
                                                        final List<KiePMMLDroolsType> types) {
         logger.trace("getKiePMMLDroolsAST {} {} {}", dataDictionary, model, fieldTypeMap);
         DATA_TYPE targetType = getTargetFieldType(dataDictionary, model);
-        final List<KiePMMLOutputField> outputFields = getOutputFields(model);
+        List<OutputField> outputFields =  model.getOutput() != null ? model.getOutput().getOutputFields() : Collections.emptyList();
         KiePMMLScorecardModelCharacteristicASTFactory factory = KiePMMLScorecardModelCharacteristicASTFactory.factory(fieldTypeMap, outputFields, targetType);
         if (model.isUseReasonCodes()) {
             factory = factory.withReasonCodes(model.getBaselineScore(), REASONCODE_ALGORITHM.byName(model.getReasonCodeAlgorithm().value()));

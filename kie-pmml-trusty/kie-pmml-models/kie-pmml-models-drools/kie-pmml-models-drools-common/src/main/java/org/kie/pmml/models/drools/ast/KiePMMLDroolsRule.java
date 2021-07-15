@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
+import org.dmg.pmml.OutputField;
 import org.kie.pmml.api.enums.ResultCode;
-import org.kie.pmml.commons.model.KiePMMLOutputField;
 import org.kie.pmml.models.drools.tuples.KiePMMLReasonCodeAndValue;
 
 /**
@@ -33,7 +33,7 @@ public class KiePMMLDroolsRule {
     private final String name;
     // RHS
     private final String statusToSet;
-    private final List<KiePMMLOutputField> outputFields;
+    private final List<OutputField> outputFields;
     // LHS
     private String agendaGroup;
     private String activationGroup;
@@ -62,7 +62,7 @@ public class KiePMMLDroolsRule {
     private Double toAccumulate;
     private boolean accumulationResult = false;
 
-    private KiePMMLDroolsRule(String name, String statusToSet, List<KiePMMLOutputField> outputFields) {
+    private KiePMMLDroolsRule(String name, String statusToSet, List<OutputField> outputFields) {
         this.name = name;
         this.statusToSet = statusToSet;
         this.outputFields = outputFields;
@@ -99,7 +99,7 @@ public class KiePMMLDroolsRule {
      * <p><code>update($statusHolder);</code></p>
      * @return
      */
-    public static Builder builder(String name, String statusToSet, List<KiePMMLOutputField> outputFields) {
+    public static Builder builder(String name, String statusToSet, List<OutputField> outputFields) {
         return new Builder(name, statusToSet, outputFields);
     }
 
@@ -117,7 +117,7 @@ public class KiePMMLDroolsRule {
         return statusToSet;
     }
 
-    public List<KiePMMLOutputField> getOutputFields() {
+    public List<OutputField> getOutputFields() {
         return outputFields;
     }
 
@@ -275,7 +275,7 @@ public class KiePMMLDroolsRule {
          * @param statusToSet
          * @param outputFields
          */
-        public Builder(String name, String statusToSet, List<KiePMMLOutputField> outputFields) {
+        public Builder(String name, String statusToSet, List<OutputField> outputFields) {
             this.toBuild = new KiePMMLDroolsRule(name, statusToSet, outputFields);
         }
 

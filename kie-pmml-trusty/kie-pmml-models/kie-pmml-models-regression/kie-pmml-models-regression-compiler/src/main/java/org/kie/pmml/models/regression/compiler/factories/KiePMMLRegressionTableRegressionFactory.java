@@ -38,6 +38,8 @@ import com.github.javaparser.ast.expr.StringLiteralExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
+import org.dmg.pmml.OutputField;
+import org.dmg.pmml.ResultFeature;
 import org.dmg.pmml.regression.CategoricalPredictor;
 import org.dmg.pmml.regression.NumericPredictor;
 import org.dmg.pmml.regression.PredictorTerm;
@@ -45,7 +47,6 @@ import org.dmg.pmml.regression.RegressionModel;
 import org.dmg.pmml.regression.RegressionTable;
 import org.kie.pmml.api.exceptions.KiePMMLException;
 import org.kie.pmml.api.exceptions.KiePMMLInternalException;
-import org.kie.pmml.commons.model.KiePMMLOutputField;
 import org.kie.pmml.compiler.commons.utils.CommonCodegenUtils;
 import org.kie.pmml.compiler.commons.utils.JavaParserUtils;
 import org.kie.pmml.models.regression.model.tuples.KiePMMLTableSourceCategory;
@@ -56,7 +57,6 @@ import static java.util.stream.Collectors.groupingBy;
 import static org.kie.pmml.commons.Constants.MISSING_BODY_TEMPLATE;
 import static org.kie.pmml.commons.Constants.MISSING_DEFAULT_CONSTRUCTOR;
 import static org.kie.pmml.commons.Constants.MISSING_VARIABLE_IN_BODY;
-import static org.kie.pmml.api.enums.RESULT_FEATURE.PREDICTED_VALUE;
 import static org.kie.pmml.compiler.commons.utils.CommonCodegenUtils.addMapPopulation;
 import static org.kie.pmml.compiler.commons.utils.CommonCodegenUtils.addMethod;
 import static org.kie.pmml.compiler.commons.utils.CommonCodegenUtils.getVariableDeclarator;
@@ -98,7 +98,7 @@ public class KiePMMLRegressionTableRegressionFactory {
      */
     public static LinkedHashMap<String, KiePMMLTableSourceCategory> getRegressionTables(final List<RegressionTable> regressionTables,
                                                                                         final RegressionModel.NormalizationMethod normalizationMethod,
-                                                                                        final List<KiePMMLOutputField> outputFields,
+                                                                                        final List<OutputField> outputFields,
                                                                                         final String targetField,
                                                                                         final String packageName) {
         logger.trace("getRegressionTables {}", regressionTables);
@@ -119,7 +119,7 @@ public class KiePMMLRegressionTableRegressionFactory {
 
     public static Map.Entry<String, String> getRegressionTable(final RegressionTable regressionTable,
                                                                final RegressionModel.NormalizationMethod normalizationMethod,
-                                                               final List<KiePMMLOutputField> outputFields,
+                                                               final List<OutputField> outputFields,
                                                                final String targetField,
                                                                final String packageName) {
         logger.trace("getRegressionTable {}", regressionTable);
@@ -170,11 +170,11 @@ public class KiePMMLRegressionTableRegressionFactory {
      * @param outputFields
      */
     static void populateOutputFieldsMapWithResult(final BlockStmt body,
-                                                  final List<KiePMMLOutputField> outputFields) {
+                                                  final List<OutputField> outputFields) {
         outputFields.stream()
-                .filter(outputField -> PREDICTED_VALUE.equals(outputField.getResultFeature()))
+                .filter(outputField -> ResultFeature.PREDICTED_VALUE.equals(outputField.getResultFeature()))
                 .forEach(outputField -> {
-                    StringLiteralExpr key = new StringLiteralExpr(outputField.getName());
+                    StringLiteralExpr key = new StringLiteralExpr(outputField.getName().getValue());
                     Expression value = new NameExpr("result");
                     NodeList<Expression> expressions = NodeList.nodeList(key, value);
                     body.addStatement(new MethodCallExpr(new NameExpr("outputFieldsMap"), "put", expressions));

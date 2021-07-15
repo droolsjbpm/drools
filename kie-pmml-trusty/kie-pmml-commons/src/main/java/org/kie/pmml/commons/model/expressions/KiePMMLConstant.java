@@ -20,11 +20,8 @@ import java.util.Objects;
 import java.util.StringJoiner;
 
 import org.kie.pmml.commons.model.KiePMMLExtension;
-import org.kie.pmml.commons.model.KiePMMLOutputField;
+import org.kie.pmml.commons.model.ProcessingDTO;
 import org.kie.pmml.commons.model.abstracts.AbstractKiePMMLComponent;
-import org.kie.pmml.commons.model.tuples.KiePMMLNameValue;
-import org.kie.pmml.commons.transformations.KiePMMLDefineFunction;
-import org.kie.pmml.commons.transformations.KiePMMLDerivedField;
 
 /**
  * @see <a href=http://dmg.org/pmml/v4-4-1/Transformations.html#xsdElement_Constant>Constant</a>
@@ -44,10 +41,7 @@ public class KiePMMLConstant extends AbstractKiePMMLComponent implements KiePMML
     }
 
     @Override
-    public Object evaluate(final List<KiePMMLDefineFunction> defineFunctions,
-                           final List<KiePMMLDerivedField> derivedFields,
-                           final List<KiePMMLOutputField> outputFields,
-                           final List<KiePMMLNameValue> kiePMMLNameValues) {
+    public Object evaluate(final ProcessingDTO processingDTO) {
         return getValue();
     }
 

@@ -70,6 +70,7 @@ public class KiePMMLUtilTest {
     private static final String NO_MODELNAME_NO_SEGMENT_ID_NOSEGMENT_TARGET_FIELD_SAMPLE =
             "NoModelNameNoSegmentIdNoSegmentTargetFieldSample.pmml";
     private static final String NO_TARGET_FIELD_SAMPLE = "NoTargetFieldSample.pmml";
+    private static final String NO_OUTPUT_FIELD_TARGET_NAME_SAMPLE = "NoOutputFieldTargetNameSample.pmml";
     private static final String MINING_WITH_SAME_NESTED_MODEL_NAMES = "MiningWithSameNestedModelNames.pmml";
 
     @Test
@@ -118,6 +119,20 @@ public class KiePMMLUtilTest {
                            .stream()
                            .anyMatch(dataField -> dataField.getName().equals(targetField.getName())));
         assertEquals(targetField.getName(), toPopulate.getTargets().getTargets().get(0).getField());
+    }
+
+    @Test
+    public void populateMissingPredictedOutputFieldTarget() throws Exception {
+        final InputStream inputStream = getFileInputStream(NO_OUTPUT_FIELD_TARGET_NAME_SAMPLE);
+        final PMML pmml = org.jpmml.model.PMMLUtil.unmarshal(inputStream);
+        final Model toPopulate = pmml.getModels().get(0);
+        final OutputField outputField = toPopulate.getOutput().getOutputFields().get(0);
+        assertEquals(ResultFeature.PREDICTED_VALUE, outputField.getResultFeature());
+        assertNull(outputField.getTargetField());
+        KiePMMLUtil.populateMissingPredictedOutputFieldTarget(toPopulate);
+        final MiningField targetField = getMiningTargetFields(toPopulate.getMiningSchema().getMiningFields()).get(0);
+        assertNotNull(outputField.getTargetField());
+        assertEquals(targetField.getName(), outputField.getTargetField());
     }
 
     @Test

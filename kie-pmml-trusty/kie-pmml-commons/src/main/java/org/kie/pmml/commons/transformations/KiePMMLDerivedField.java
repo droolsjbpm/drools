@@ -19,14 +19,11 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.kie.pmml.api.enums.DATA_TYPE;
-import org.kie.pmml.api.enums.INVALID_VALUE_TREATMENT_METHOD;
 import org.kie.pmml.api.enums.OP_TYPE;
 import org.kie.pmml.commons.model.KiePMMLExtension;
-import org.kie.pmml.commons.model.KiePMMLOutputField;
+import org.kie.pmml.commons.model.ProcessingDTO;
 import org.kie.pmml.commons.model.abstracts.AbstractKiePMMLComponent;
-import org.kie.pmml.commons.model.expressions.KiePMMLApply;
 import org.kie.pmml.commons.model.expressions.KiePMMLExpression;
-import org.kie.pmml.commons.model.tuples.KiePMMLNameValue;
 
 /**
  * @see <a href=http://dmg.org/pmml/v4-4-1/Transformations.html#xsdElement_DerivedField>DerivedField</a>
@@ -71,11 +68,8 @@ public class KiePMMLDerivedField extends AbstractKiePMMLComponent implements Ser
         return displayName;
     }
 
-    public Object evaluate(final List<KiePMMLDefineFunction> defineFunctions,
-                           final List<KiePMMLDerivedField> derivedFields,
-                           final List<KiePMMLOutputField> outputFields,
-                           final List<KiePMMLNameValue> kiePMMLNameValues) {
-        return kiePMMLExpression.evaluate(defineFunctions, derivedFields, outputFields, kiePMMLNameValues);
+    public Object evaluate(final ProcessingDTO processingDTO) {
+        return kiePMMLExpression.evaluate(processingDTO);
     }
 
     public static class Builder extends AbstractKiePMMLComponent.Builder<KiePMMLDerivedField> {
