@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2021 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 @Category(TurtleTestCategory.class)
-public class ConstraintConcurrencyTest {
+public class ConstraintWithAndOrConcurrencyTest {
 
     private static int LOOP = 500;
 
@@ -51,52 +51,64 @@ public class ConstraintConcurrencyTest {
 
     private final KieBaseTestConfiguration kieBaseTestConfiguration;
 
-    public ConstraintConcurrencyTest(final KieBaseTestConfiguration kieBaseTestConfiguration) {
+    public ConstraintWithAndOrConcurrencyTest(final KieBaseTestConfiguration kieBaseTestConfiguration) {
         this.kieBaseTestConfiguration = kieBaseTestConfiguration;
     }
 
     @Parameterized.Parameters(name = "KieBase type={0}")
     public static Collection<Object[]> getParameters() {
-        return TestParametersUtil.getKieBaseCloudConfigurations(true);
+        return TestParametersUtil.getKieBaseCloudConfigurations(false);
     }
 
     @Test(timeout = 300000)
     public void testConstraintConcurrency() {
         final String drl =
                 "package com.example.reproducer\n" +
-                           "import " + Bus.class.getCanonicalName() + ";\n" +
-                           "import static " + ConstraintConcurrencyTest.class.getCanonicalName() + ".TOSTRING;\n" +
-                           "dialect \"mvel\"\n" +
-                           "rule \"rule_mt_1a\"\n" +
-                           "    when\n" +
-                           "        $bus : Bus( $check: \"GAMMA RAY\",\n" +
-                           "                    $title: \"POWER PLANT\",\n" +
-                           "                    karaoke.dvd[$title] != null,\n" +
-                           "                    TOSTRING(karaoke.dvd[$title].artist) != null )\n" +
-                           "    then\n" +
-                           "end";
+                        "import " + Bus.class.getCanonicalName() + ";\n" +
+                        "import static " + ConstraintWithAndOrConcurrencyTest.class.getCanonicalName() + ".TOSTRING;\n" +
+                        "dialect \"mvel\"\n" +
+                        "rule \"rule_mt_1a\"\n" +
+                        "    when\n" +
+                        "        $bus : Bus( $check: \"GAMMA RAY\",\n" +
+                        "                    $title: \"POWER PLANT\",\n" +
+                        "                    karaoke.dvd[$title] != null,\n" +
+                        "                    TOSTRING(karaoke.dvd[$title].artist) == \"BBB\" || TOSTRING(karaoke.dvd[$title].artist) >= \"01\" && TOSTRING(karaoke.dvd[$title].artist) <= \"39\" )\n" +
+                        "    then\n" +
+                        "end";
 
         List<Exception> exceptions = new ArrayList<>();
 
-        KieBase kieBase = null;
-        if(kieBaseTestConfiguration.isExecutableModel()) { // There's no such a thing as jitting, so we can create the KieBase once
-            kieBase = KieBaseUtil.getKieBaseFromKieModuleFromDrl("accumulate-test", kieBaseTestConfiguration, drl);
-        }
         for (int i = 0; i < LOOP; i++) {
-            if(!kieBaseTestConfiguration.isExecutableModel()) { // to reset MVELConstraint Jitting we need to create a new KieBase each time
-                kieBase = KieBaseUtil.getKieBaseFromKieModuleFromDrl("accumulate-test", kieBaseTestConfiguration, drl);
-            }
+            final KieBase kieBase = KieBaseUtil.getKieBaseFromKieModuleFromDrl("accumulate-test", kieBaseTestConfiguration, drl);
+
+            // 1st run
+            KieSession kSession1 = kieBase.newKieSession();
+            Bus bus1 = new Bus("red", 30);
+            bus1.getKaraoke().getDvd().put("POWER PLANT", new Album("POWER PLANT", "BBB")); // match the 1st condition -> short circuit
+            bus1.getKaraoke().getDvd().put("Somewhere Out In Space", new Album("Somewhere Out In Space", "GAMMA RAY"));
+            kSession1.insert(bus1);
+            kSession1.fireAllRules();
+            kSession1.dispose();
+
+            // 2nd run
+            KieSession kSession2 = kieBase.newKieSession();
+            Bus bus2 = new Bus("red", 30);
+            bus2.getKaraoke().getDvd().put("POWER PLANT", new Album("POWER PLANT", "00")); // not match the 1st condition, not match the 2nd condition -> short circuit
+            bus2.getKaraoke().getDvd().put("Somewhere Out In Space", new Album("Somewhere Out In Space", "GAMMA RAY"));
+            kSession2.insert(bus2);
+            kSession2.fireAllRules();
+            kSession2.dispose();
+
             ExecutorService executor = Executors.newFixedThreadPool(THREADS);
             CountDownLatch latch = new CountDownLatch(THREADS);
             for (int j = 0; j < REQUESTS; j++) {
-                KieBase finalKieBase = kieBase;
                 executor.execute(new Runnable() {
 
                     public void run() {
-                        KieSession kSession = finalKieBase.newKieSession();
+                        KieSession kSession = kieBase.newKieSession();
 
                         Bus bus1 = new Bus("red", 30);
-                        bus1.getKaraoke().getDvd().put("POWER PLANT", new Album("POWER PLANT", "GAMMA RAY"));
+                        bus1.getKaraoke().getDvd().put("POWER PLANT", new Album("POWER PLANT", "10")); // not match the 1st condition, match the 2nd & 3rd condition
                         bus1.getKaraoke().getDvd().put("Somewhere Out In Space", new Album("Somewhere Out In Space", "GAMMA RAY"));
                         kSession.insert(bus1);
 
@@ -110,7 +122,6 @@ public class ConstraintConcurrencyTest {
                         try {
                             kSession.fireAllRules();
                         } catch (Exception e) {
-                            // java.lang.RuntimeException: Error evaluating constraint 'TOSTRING(karaoke.dvd[$title].artist) != null' in [Rule "rule_mt_1a" in rules1.drl]
                             exceptions.add(e);
                         } finally {
                             kSession.dispose();

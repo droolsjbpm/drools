@@ -16,6 +16,7 @@
 package org.drools.mvel.expr;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.drools.mvel.MVELSafeHelper;
@@ -26,23 +27,46 @@ import org.mvel2.integration.VariableResolverFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.drools.mvel.MVELConditionEvaluator.isFullyEvaluated;
+
 public class MvelEvaluator<T> {
-    private static final boolean THREAD_SAFE = true;
+
+    private static final boolean THREAD_UNSAFE = Boolean.valueOf( System.getProperty("drools.mvel.thread.unsafe") );
+
+    private static final EvaluatorType DEFAULT_EVALUATOR_TYPE = EvaluatorType.THREAD_SAFE_ON_FIRST_EVAL;
 
     private static final Logger logger = LoggerFactory.getLogger(MvelEvaluator.class);
 
-    private final Serializable expr;
+    protected final Serializable expr;
+
+    public enum EvaluatorType {
+        THREAD_UNSAFE, THREAD_SAFE_ON_FIRST_EVAL, SYNCHRONIZED_TILL_EVALUATED, FULLY_SYNCHRONIZED;
+
+        public <T> MvelEvaluator<T> createMvelEvaluator(Serializable expr) {
+            switch (this) {
+                case THREAD_UNSAFE: return new MvelEvaluator<>(expr);
+                case THREAD_SAFE_ON_FIRST_EVAL: return new MvelEvaluator.ThreadSafe<>(expr);
+                case SYNCHRONIZED_TILL_EVALUATED: return new MvelEvaluator.SynchronizedTillEvaluated<>(expr);
+                case FULLY_SYNCHRONIZED: return new MvelEvaluator.FullySynchronized<>(expr);
+            }
+            throw new UnsupportedOperationException();
+        }
+    }
 
     private MvelEvaluator(Serializable expr) {
         this.expr = expr;
     }
 
     public static <T> MvelEvaluator<T> createMvelEvaluator(Serializable expr) {
-        return THREAD_SAFE ? new MvelEvaluator.ThreadSafe(expr) : new MvelEvaluator(expr);
+        return createMvelEvaluator(DEFAULT_EVALUATOR_TYPE, expr);
+    }
+
+    public static <T> MvelEvaluator<T> createMvelEvaluator(EvaluatorType evaluatorType, Serializable expr) {
+        return THREAD_UNSAFE ? EvaluatorType.THREAD_UNSAFE.createMvelEvaluator(expr) : evaluatorType.createMvelEvaluator(expr);
     }
 
     public T evaluate(Object ctx) {
-        return evaluate(ctx, null);
+        return evaluate(ctx, (VariableResolverFactory) null);
     }
 
     public T evaluate(VariableResolverFactory factory) {
@@ -53,7 +77,11 @@ public class MvelEvaluator<T> {
         return internalEvaluate(ctx, factory);
     }
 
-    private <T> T internalEvaluate(Object ctx, VariableResolverFactory factory) {
+    public T evaluate(Object ctx, Map<String, Object> vars) {
+        return (T) MVELSafeHelper.getEvaluator().executeExpression(this.expr, ctx, vars);
+    }
+
+    protected <T> T internalEvaluate(Object ctx, VariableResolverFactory factory) {
         if (MVELDebugHandler.isDebugMode() && this.expr instanceof CompiledExpression) {
             CompiledExpression compexpr = (CompiledExpression) this.expr;
             if (MVELDebugHandler.verbose) {
@@ -81,33 +109,108 @@ public class MvelEvaluator<T> {
         }
 
         @Override
+        public synchronized T evaluate(Object ctx, Map<String, Object> vars) {
+            if (state.get() != State.INITIALIZED && isFirstEvaluation()) {
+                T result = super.evaluate(ctx, vars);
+                notifyFirstEvaluationDone();
+                return result;
+            }
+
+            return super.evaluate(ctx, vars);
+        }
+
+        @Override
         public T evaluate(Object ctx, VariableResolverFactory factory) {
-            if (state.get() != State.INITIALIZED) {
-                if (state.compareAndSet(State.NEW, State.INITIALIZING)) {
-                    T result = super.evaluate(ctx, factory);
-                    synchronized (state) {
-                        boolean shouldNotify = state.get() == State.CONTENTED;
-                        state.set(State.INITIALIZED);
-                        if (shouldNotify) {
-                            state.notifyAll();
-                        }
-                    }
-                    return result;
-                } else {
-                    synchronized (state) {
-                        if (state.get() != State.INITIALIZED) {
-                            try {
-                                state.set(State.CONTENTED);
-                                state.wait();
-                            } catch (InterruptedException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
+            if (state.get() != State.INITIALIZED && isFirstEvaluation()) {
+                T result = internalEvaluate(ctx, factory);
+                notifyFirstEvaluationDone();
+                return result;
+            }
+
+            return internalEvaluate(ctx, factory);
+        }
+
+        private void notifyFirstEvaluationDone() {
+            synchronized (state) {
+                boolean shouldNotify = state.get() == State.CONTENTED;
+                state.set(State.INITIALIZED);
+                if (shouldNotify) {
+                    state.notifyAll();
+                }
+            }
+        }
+
+        private boolean isFirstEvaluation() {
+            if (state.compareAndSet(State.NEW, State.INITIALIZING)) {
+                return true;
+            }
+            waitForFirstEvaluation();
+            return false;
+        }
+
+        private void waitForFirstEvaluation() {
+            synchronized (state) {
+                if (state.get() != State.INITIALIZED) {
+                    try {
+                        state.set(State.CONTENTED);
+                        state.wait();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
                     }
                 }
             }
+        }
+    }
 
-            return super.evaluate(ctx, factory);
+    private static class SynchronizedTillEvaluated<T> extends MvelEvaluator<T> {
+
+        private volatile boolean fullyEvaluated;
+
+        public SynchronizedTillEvaluated(Serializable expr) {
+            super(expr);
+        }
+
+        @Override
+        public T evaluate(Object ctx, VariableResolverFactory factory) {
+            if (fullyEvaluated) {
+                return internalEvaluate(ctx, factory);
+            }
+
+            synchronized (this) {
+                T result = internalEvaluate(ctx, factory);
+                fullyEvaluated = isFullyEvaluated(expr);
+                return result;
+            }
+        }
+
+        @Override
+        public T evaluate(Object ctx, Map<String, Object> vars) {
+            if (fullyEvaluated) {
+                return super.evaluate(ctx, vars);
+            }
+
+            synchronized (this) {
+                T result = super.evaluate(ctx, vars);
+                fullyEvaluated = isFullyEvaluated(expr);
+                return result;
+            }
+        }
+    }
+
+    private static class FullySynchronized<T> extends MvelEvaluator<T> {
+
+        public FullySynchronized(Serializable expr) {
+            super(expr);
+        }
+
+        @Override
+        public synchronized T evaluate(Object ctx, VariableResolverFactory factory) {
+            return internalEvaluate(ctx, factory);
+        }
+
+        @Override
+        public synchronized T evaluate(Object ctx, Map<String, Object> vars) {
+            return super.evaluate(ctx, vars);
         }
     }
 }
