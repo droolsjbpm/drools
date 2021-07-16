@@ -43,7 +43,6 @@ import org.drools.core.reteoo.EntryPointNode;
 import org.drools.core.reteoo.ObjectTypeNode;
 import org.drools.core.reteoo.Rete;
 import org.drools.core.reteoo.RuleTerminalNode;
-import org.drools.core.util.ClassUtils;
 import org.drools.testcoverage.common.model.Address;
 import org.drools.testcoverage.common.model.Message;
 import org.drools.testcoverage.common.model.Person;
@@ -91,7 +90,6 @@ import org.kie.internal.builder.InternalKieBuilder;
 import org.kie.internal.command.CommandFactory;
 
 import static java.util.Arrays.asList;
-
 import static org.drools.core.util.DroolsTestUtil.rulestoMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

@@ -155,4 +155,6 @@ public interface InternalKnowledgePackage extends KiePackage,
     TraitRegistry getTraitRegistry();
 
     void addCloningResource(String key, Object resource);
+
+    void wireTypeDeclarations();
 }

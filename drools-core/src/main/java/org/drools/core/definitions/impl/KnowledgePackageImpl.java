@@ -618,6 +618,21 @@ public class KnowledgePackageImpl
         }
     }
 
+    public void wireTypeDeclarations() {
+        for (TypeDeclaration typeDeclaration : typeDeclarations.values()) {
+            Class<?> typeClass = null;
+            try {
+                typeClass = typeDeclaration.getTypeClass();
+                if (typeClass != null || !typeClass.isPrimitive()) {
+                    Class<?> cls = getPackageClassLoader().loadClass(typeClass.getName());
+                    typeDeclaration.setTypeClass(cls);
+                }
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException("Unable to load typeClass '" + typeClass.getName() + "'");
+            }
+        }
+    }
+
     public ClassFieldAccessorStore getClassFieldAccessorStore() {
         return classFieldAccessorStore;
     }
